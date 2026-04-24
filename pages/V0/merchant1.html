@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DhamanPay | Merchant Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;700;800&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'dp-dark': '#0b1f3a',
+            'dp-blue': '#1d4ed8',
+            'dp-blue-soft': '#dbeafe',
+            'dp-white': '#f8fbff',
+            'dp-gold': '#D4AF37',
+            'dp-gold-light': '#F7E7A1',
+            'dp-gold-soft': '#F8F0C8',
+            'dp-gold-deep': '#A87412',
+            'dp-gold-dark': '#6E4B0D',
+            'dp-gray': '#64748b'
+          },
+          fontFamily: {
+            sans: ['Manrope', 'sans-serif'],
+            display: ['Oswald', 'sans-serif']
+          },
+          boxShadow: {
+            glow: '0 20px 60px rgba(29, 78, 216, 0.15)',
+            glowStrong: '0 25px 80px rgba(29, 78, 216, 0.22)',
+            goldGlow: '0 18px 45px rgba(212, 175, 55, 0.28)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Manrope', sans-serif;
+      background: #f8fbff;
+      color: #0b1f3a;
+      overflow-x: hidden;
+    }
+
+    .hero-grid::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: linear-gradient(to bottom, black, transparent);
+      pointer-events: none;
+    }
+
+    .glass-card {
+      backdrop-filter: blur(14px);
+    }
+
+    .floating-orb {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(65px);
+      opacity: 0.28;
+      pointer-events: none;
+    }
+
+    .gold-metallic-text {
+      background: linear-gradient(
+        90deg,
+        #6E4B0D 0%,
+        #B8860B 10%,
+        #F7E7A1 22%,
+        #C99700 34%,
+        #5A3D0A 44%,
+        #E7D37A 58%,
+        #FFF4B5 70%,
+        #B27A10 84%,
+        #D4AF37 100%
+      );
+      background-size: 220% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      animation: goldShift 6s linear infinite;
+    }
+
+    .gold-button {
+      background: linear-gradient(
+        90deg,
+        #6E4B0D 0%,
+        #B8860B 12%,
+        #F7E7A1 25%,
+        #C99700 40%,
+        #8B6508 54%,
+        #F3E28E 68%,
+        #B27A10 84%,
+        #D4AF37 100%
+      );
+      background-size: 220% auto;
+      color: #0b1f3a;
+      box-shadow: 0 14px 34px rgba(212,175,55,0.28);
+      transition: all 0.35s ease;
+    }
+
+    .gold-button:hover {
+      background-position: 100% center;
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 18px 42px rgba(212,175,55,0.35);
+    }
+
+    .gold-soft-bg {
+      background: linear-gradient(
+        90deg,
+        rgba(110,75,13,0.10) 0%,
+        rgba(212,175,55,0.20) 30%,
+        rgba(247,231,161,0.28) 50%,
+        rgba(168,116,18,0.18) 100%
+      );
+    }
+
+    .gold-border {
+      border-color: rgba(212,175,55,0.22);
+    }
+
+    .custom-scroll::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #eff6ff;
+    }
+
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #1d4ed8;
+      border-radius: 999px;
+    }
+
+    .loader {
+      position: fixed;
+      inset: 0;
+      background: #0b1f3a;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.8s ease-in-out;
+    }
+
+    .loader-bar-bg {
+      width: 220px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.12);
+      margin-top: 18px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loader-bar {
+      width: 0%;
+      height: 100%;
+      background: #D4AF37;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .float-btn {
+      position: fixed;
+      z-index: 50;
+      width: 3.25rem;
+      height: 3.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9999px;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+    }
+
+    .float-btn:hover {
+      transform: translateY(-3px);
+    }
+
+    #scroll-top {
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: #1d4ed8;
+      color: white;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #scroll-top.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .order-card {
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .order-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(29, 78, 216, 0.08);
+    }
+
+    details summary {
+      list-style: none;
+    }
+
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    @keyframes goldShift {
+      to {
+        background-position: 220% center;
+      }
+    }
+  </style>
+</head>
+<body class="custom-scroll">
+
+  <div class="loader" id="loader">
+    <div class="text-white font-display text-3xl tracking-[0.25em] uppercase">DhamanPay</div>
+    <div class="loader-bar-bg">
+      <div class="loader-bar" id="loader-bar"></div>
+    </div>
+  </div>
+
+  <button id="scroll-top" class="float-btn" aria-label="Scroll to Top">
+    <i class="ph ph-arrow-up text-xl"></i>
+  </button>
+
+  <!-- CREATE ORDER MODAL -->
+  <div id="createOrderModal" class="fixed inset-0 z-[100] hidden">
+    <div id="modalBackdrop" class="absolute inset-0 bg-black/60"></div>
+
+    <div class="relative z-10 min-h-screen flex items-center justify-center p-4">
+      <div class="w-full max-w-2xl max-h-[90vh] rounded-[2rem] bg-white border border-blue-100 shadow-2xl overflow-hidden flex flex-col">
+        <div class="bg-dp-dark text-white px-6 py-5 flex items-center justify-between shrink-0">
+          <div>
+            <p class="text-blue-200 uppercase tracking-[0.2em] text-xs mb-1">Merchant Action</p>
+            <h2 class="text-2xl font-display">Create Order</h2>
+          </div>
+          <button id="closeCreateOrder" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center">
+            <i class="ph ph-x text-xl"></i>
+          </button>
+        </div>
+
+        <form id="createOrderForm" class="flex-1 overflow-y-auto p-6 md:p-7 space-y-5 custom-scroll">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm font-semibold text-dp-dark mb-2">Order Code</label>
+              <input id="orderCode" type="text" placeholder="ORD-002"
+                class="w-full px-4 py-3 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue">
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-dp-dark mb-2">Customer ID</label>
+              <input id="customerId" type="number" placeholder="5"
+                class="w-full px-4 py-3 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue">
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-dp-dark mb-2">Merchant ID</label>
+              <input id="merchantId" type="number" placeholder="6"
+                class="w-full px-4 py-3 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue">
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-dp-dark mb-2">Courier ID</label>
+              <input id="courierId" type="number" placeholder="1"
+                class="w-full px-4 py-3 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue">
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold text-dp-dark mb-2">Amount</label>
+              <input id="amount" type="number" placeholder="4500"
+                class="w-full px-4 py-3 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue">
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold text-dp-dark mb-2">Delivery Address</label>
+              <textarea id="deliveryAddress" rows="3" placeholder="tizi ouezou"
+                class="w-full px-4 py-3 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue"></textarea>
+            </div>
+          </div>
+
+          <details class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+            <summary class="flex items-center justify-between cursor-pointer">
+              <span class="text-xs uppercase tracking-[0.2em] text-dp-gray">JSON Preview</span>
+              <i class="ph ph-caret-down text-dp-gray"></i>
+            </summary>
+            <pre id="jsonPreview" class="mt-3 text-sm text-dp-dark whitespace-pre-wrap break-words"></pre>
+          </details>
+
+          <div class="sticky bottom-0 bg-white pt-4 pb-1 border-t border-slate-200 flex flex-col sm:flex-row gap-3">
+            <button type="submit" class="gold-button px-6 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold">
+              Create Order
+            </button>
+            <button type="button" id="fillDemoData" class="bg-dp-blue text-white px-6 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold hover:bg-blue-700 transition-colors">
+              Fill Demo Data
+            </button>
+            <button type="button" id="cancelCreateOrder" class="bg-slate-100 text-dp-dark px-6 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold hover:bg-slate-200 transition-colors">
+              Cancel
+            </button>
+          </div>
+
+          <div id="formMessage" class="hidden rounded-2xl p-4 text-sm"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300 py-5 px-6 md:px-10 text-white">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <a href="#" class="text-2xl font-display font-bold tracking-[0.12em]">
+        <span class="text-white">DHAMAN</span><span class="gold-metallic-text">PAY</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-8">
+        <a href="#overview" class="uppercase text-xs tracking-[0.2em] font-bold hover:text-dp-gold transition-colors">Overview</a>
+        <a href="#orders" class="uppercase text-xs tracking-[0.2em] font-bold hover:text-dp-gold transition-colors">Orders</a>
+        <a href="#details" class="uppercase text-xs tracking-[0.2em] font-bold hover:text-dp-gold transition-colors">Order Details</a>
+        <button id="openCreateOrderNav" class="gold-button px-5 py-3 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold">
+          Create Order
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <section class="relative min-h-[72vh] bg-dp-dark overflow-hidden hero-grid flex items-center pt-24">
+    <div class="absolute inset-0 bg-gradient-to-br from-dp-dark via-dp-blue/70 to-dp-dark"></div>
+    <div class="floating-orb w-72 h-72 top-10 left-10" style="background:#D4AF37;"></div>
+    <div class="floating-orb w-96 h-96 bottom-0 right-0" style="background:#1d4ed8;"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full grid grid-cols-1 lg:grid-cols-[1.2fr_0.9fr] gap-12 items-center">
+      <div>
+        <p class="hero-reveal uppercase tracking-[0.35em] text-dp-gold-light text-xs md:text-sm mb-5">Merchant Dashboard</p>
+        <h1 class="hero-reveal font-display uppercase leading-none tracking-[0.06em] text-[3.4rem] md:text-[6rem] lg:text-[7rem] mb-6">
+          <span class="text-white">Create.</span><br>
+          <span class="gold-metallic-text">Track.</span>
+        </h1>
+        <p class="hero-reveal text-white/85 max-w-xl leading-relaxed text-base md:text-lg">
+          Create merchant orders, monitor escrow visibility, and review every order in a clean DhamanPay workflow dashboard.
+        </p>
+
+        <div class="hero-reveal mt-10 flex flex-wrap gap-4">
+          <button id="openCreateOrderHero" class="gold-button px-6 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold">
+            Create Order
+          </button>
+          <a href="#orders" class="border border-white/20 text-white px-6 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold hover:bg-white hover:text-dp-dark transition-all">
+            View Orders
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-reveal glass-card rounded-[2rem] border border-white/10 bg-white/10 p-6 md:p-8 shadow-glow">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <p class="text-white/65 text-xs uppercase tracking-[0.25em] mb-2">Merchant</p>
+            <h3 class="text-white text-2xl font-display tracking-wide">Mayuush Store</h3>
+          </div>
+          <div class="w-14 h-14 rounded-2xl gold-soft-bg flex items-center justify-center text-dp-gold text-3xl border gold-border">
+            <i class="ph-fill ph-storefront"></i>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="rounded-2xl bg-white/10 p-5 border border-white/10">
+            <p class="text-white/65 text-xs uppercase tracking-[0.2em]">Total Earned</p>
+            <p id="heroEarned" class="text-white text-3xl font-bold mt-3">$0</p>
+          </div>
+          <div class="rounded-2xl bg-white/10 p-5 border border-white/10">
+            <p class="text-white/65 text-xs uppercase tracking-[0.2em]">Pending Escrow</p>
+            <p id="heroPending" class="text-white text-3xl font-bold mt-3">$0</p>
+          </div>
+          <div class="rounded-2xl bg-white/10 p-5 border border-white/10">
+            <p class="text-white/65 text-xs uppercase tracking-[0.2em]">Active Orders</p>
+            <p id="heroActive" class="text-white text-3xl font-bold mt-3">0</p>
+          </div>
+          <div class="rounded-2xl bg-white/10 p-5 border border-white/10">
+            <p class="text-white/65 text-xs uppercase tracking-[0.2em]">Completed</p>
+            <p id="heroCompleted" class="text-white text-3xl font-bold mt-3">0</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="overview" class="py-20 md:py-24 bg-dp-white">
+    <div class="max-w-7xl mx-auto px-6 md:px-10">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+        <div class="rounded-[1.75rem] bg-white border border-blue-100 p-6 shadow-glow">
+          <p class="text-dp-gray text-sm">Total Earned</p>
+          <p id="totalEarned" class="text-4xl font-extrabold mt-3 text-dp-dark">$0</p>
+          <p class="text-dp-gray text-sm mt-2">From completed orders</p>
+        </div>
+        <div class="rounded-[1.75rem] bg-white border border-blue-100 p-6 shadow-glow">
+          <p class="text-dp-gray text-sm">Pending in Escrow</p>
+          <p id="pendingEscrow" class="text-4xl font-extrabold mt-3 text-dp-blue">$0</p>
+          <p class="text-dp-gray text-sm mt-2">Protected or waiting release</p>
+        </div>
+        <div class="rounded-[1.75rem] bg-white border border-blue-100 p-6 shadow-glow">
+          <p class="text-dp-gray text-sm">Visible Orders</p>
+          <p id="visibleOrders" class="text-4xl font-extrabold mt-3 text-dp-dark">0</p>
+          <p class="text-dp-gray text-sm mt-2">Based on current filters</p>
+        </div>
+        <div class="rounded-[1.75rem] bg-white border gold-border p-6 shadow-goldGlow">
+          <p class="text-dp-gray text-sm">Completed Orders</p>
+          <p id="completedOrders" class="text-4xl font-extrabold mt-3 text-dp-gold-deep">0</p>
+          <p class="text-dp-gray text-sm mt-2">Successfully released</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="orders" class="py-8 md:py-12 bg-dp-white">
+    <div class="max-w-7xl mx-auto px-6 md:px-10">
+      <div class="rounded-[2rem] bg-white border border-blue-100 p-5 md:p-6 shadow-glow mb-8">
+        <div class="flex flex-col lg:flex-row gap-4 lg:items-center">
+          <div class="flex-1 relative">
+            <i class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-dp-gray text-lg"></i>
+            <input id="searchInput" type="text" placeholder="Search by order code or customer name"
+              class="w-full pl-12 pr-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark">
+          </div>
+          <select id="statusFilter" class="px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 text-dp-dark min-w-[180px]">
+            <option value="all">All statuses</option>
+            <option value="CREATED">Created</option>
+            <option value="ESCROW_FROZEN">Escrow Frozen</option>
+            <option value="SHIPPED">Shipped</option>
+            <option value="DELIVERED_PENDING">Delivered Pending</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="REFUNDED">Refunded</option>
+          </select>
+          <select id="sortFilter" class="px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 text-dp-dark min-w-[180px]">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="amount-high">Amount high to low</option>
+            <option value="amount-low">Amount low to high</option>
+          </select>
+          <button id="resetBtn" class="bg-dp-blue text-white px-5 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold hover:bg-blue-700 transition-colors">
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-[1.18fr_0.82fr] gap-8 items-start">
+        <div class="space-y-6">
+          <div class="group-panel rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow" data-group="Needs Attention">
+            <div class="flex justify-between items-center gap-4 mb-5 flex-wrap">
+              <div>
+                <h2 class="text-2xl font-display text-dp-dark uppercase">Needs Attention</h2>
+                <p class="text-dp-gray text-sm mt-1">Orders close to payout or needing follow-up.</p>
+              </div>
+              <span class="group-count px-4 py-2 rounded-full bg-orange-50 text-orange-700 text-xs font-bold uppercase tracking-[0.2em]">0 Orders</span>
+            </div>
+            <div id="group-needs-attention" class="space-y-3"></div>
+          </div>
+
+          <div class="group-panel rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow" data-group="In Progress">
+            <div class="flex justify-between items-center gap-4 mb-5 flex-wrap">
+              <div>
+                <h2 class="text-2xl font-display text-dp-dark uppercase">In Progress</h2>
+                <p class="text-dp-gray text-sm mt-1">Orders still being confirmed, protected, or shipped.</p>
+              </div>
+              <span class="group-count px-4 py-2 rounded-full bg-dp-blue-soft text-dp-blue text-xs font-bold uppercase tracking-[0.2em]">0 Orders</span>
+            </div>
+            <div id="group-in-progress" class="space-y-3"></div>
+          </div>
+
+          <div class="group-panel rounded-[2rem] bg-white border gold-border p-6 shadow-goldGlow" data-group="Completed">
+            <div class="flex justify-between items-center gap-4 mb-5 flex-wrap">
+              <div>
+                <h2 class="text-2xl font-display text-dp-dark uppercase">Completed</h2>
+                <p class="text-dp-gray text-sm mt-1">Orders finished successfully or refunded.</p>
+              </div>
+              <span class="group-count px-4 py-2 rounded-full gold-soft-bg text-dp-gold-dark text-xs font-bold uppercase tracking-[0.2em]">0 Orders</span>
+            </div>
+            <div id="group-completed" class="space-y-3"></div>
+          </div>
+
+          <div id="emptyState" class="hidden rounded-[2rem] bg-white border border-dashed border-blue-200 p-10 text-center text-dp-gray shadow-glow">
+            No orders yet. Create your first order to see it here.
+          </div>
+        </div>
+
+        <div id="details" class="xl:sticky xl:top-28 rounded-[2rem] bg-dp-dark text-white p-6 md:p-7 shadow-glowStrong border border-white/10">
+          <div class="flex justify-between items-start gap-4 mb-6">
+            <div>
+              <p class="text-white/60 uppercase tracking-[0.25em] text-xs mb-2">Selected Order Details</p>
+              <h3 id="detailCode" class="text-3xl font-display">No Order Selected</h3>
+            </div>
+            <span id="detailStatusBadge" class="px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-white/10 text-white">Empty</span>
+          </div>
+
+          <div class="space-y-4">
+            <div class="rounded-[1.5rem] bg-white/5 border border-white/10 p-5">
+              <p class="text-white/70 uppercase tracking-[0.2em] text-xs mb-4">Order Info</p>
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p class="text-white/50 mb-1">Amount</p>
+                  <p id="detailAmount" class="font-bold text-white">—</p>
+                </div>
+                <div>
+                  <p class="text-white/50 mb-1">Customer</p>
+                  <p id="detailCustomer" class="font-bold text-white">—</p>
+                </div>
+                <div>
+                  <p class="text-white/50 mb-1">Address</p>
+                  <p id="detailAddress" class="font-bold text-white">—</p>
+                </div>
+                <div>
+                  <p class="text-white/50 mb-1">Courier</p>
+                  <p id="detailCourier" class="font-bold text-white">—</p>
+                </div>
+                <div>
+                  <p class="text-white/50 mb-1">Payment</p>
+                  <p id="detailPayment" class="font-bold text-dp-gold-light">—</p>
+                </div>
+                <div>
+                  <p class="text-white/50 mb-1">Date</p>
+                  <p id="detailDate" class="font-bold text-white">—</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-[1.5rem] bg-white/5 border border-white/10 p-5">
+              <p class="text-white/70 uppercase tracking-[0.2em] text-xs mb-3">Payment Status</p>
+              <p id="detailPaymentText" class="text-white/85 leading-relaxed text-sm">
+                Create an order to display its escrow and payment information here.
+              </p>
+            </div>
+
+            <div class="rounded-[1.5rem] bg-white/5 border border-white/10 p-5">
+              <p class="text-white/70 uppercase tracking-[0.2em] text-xs mb-4">Progress Timeline</p>
+              <div id="detailTimeline" class="space-y-4">
+                <p class="text-white/55 text-sm">No timeline yet.</p>
+              </div>
+            </div>
+
+            <div class="rounded-[1.5rem] gold-soft-bg border gold-border p-4 text-sm text-white/90">
+              Merchant can create orders, but status actions like release and refund still do not appear here.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-dp-dark text-white pt-16 pb-10 border-t border-white/10 mt-12">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
+      <div>
+        <h3 class="font-display text-3xl tracking-[0.12em]">
+          <span class="text-white">DHAMAN</span><span class="gold-metallic-text">PAY</span>
+        </h3>
+        <p class="text-white/60 text-sm mt-4 max-w-md">
+          Merchant dashboard adapted to the DhamanPay premium theme. Orders start empty and appear after creation.
+        </p>
+      </div>
+      <div class="text-xs uppercase tracking-[0.2em] text-white/45">DhamanPay Merchant Dashboard</div>
+    </div>
+  </footer>
+
+  <script>
+    let orders = [];
+
+    function statusBadgeClass(status) {
+      return {
+        CREATED: 'bg-slate-100 text-slate-700',
+        ESCROW_FROZEN: 'bg-indigo-100 text-indigo-700',
+        SHIPPED: 'bg-blue-100 text-blue-700',
+        DELIVERED_PENDING: 'bg-amber-100 text-amber-700',
+        COMPLETED: 'bg-green-100 text-green-700',
+        REFUNDED: 'bg-red-100 text-red-700'
+      }[status] || 'bg-slate-100 text-slate-700';
+    }
+
+    function paymentBadgeClass(payment) {
+      return {
+        'Protected': 'bg-blue-50 border border-blue-200 text-blue-700',
+        'Paid': 'bg-green-50 border border-green-200 text-green-700',
+        'Not secured': 'bg-slate-50 border border-slate-200 text-slate-700',
+        'Waiting release': 'bg-amber-50 border border-amber-200 text-amber-700',
+        'Refunded': 'bg-red-50 border border-red-200 text-red-700'
+      }[payment] || 'bg-slate-50 border border-slate-200 text-slate-700';
+    }
+
+    function paymentText(order) {
+      if (order.payment === 'Protected') return 'Customer payment is protected in escrow. The merchant can monitor this state but cannot trigger workflow actions here.';
+      if (order.payment === 'Paid') return 'Funds were successfully released and this order has already paid out to the merchant.';
+      if (order.payment === 'Waiting release') return 'Delivery proof is present and the order is waiting for release by admin.';
+      if (order.payment === 'Refunded') return 'This order ended in a refund, so funds were returned to the customer.';
+      return 'Payment is not secured yet because the order is still in the created stage.';
+    }
+
+    function clearDetails() {
+      $('#detailCode').text('No Order Selected');
+      $('#detailAmount').text('—');
+      $('#detailCustomer').text('—');
+      $('#detailAddress').text('—');
+      $('#detailCourier').text('—');
+      $('#detailPayment').text('—');
+      $('#detailDate').text('—');
+      $('#detailPaymentText').text('Create an order to display its escrow and payment information here.');
+      $('#detailStatusBadge')
+        .attr('class', 'px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-white/10 text-white')
+        .text('Empty');
+      $('#detailTimeline').html('<p class="text-white/55 text-sm">No timeline yet.</p>');
+    }
+
+    function updateDetails(order) {
+      $('#detailCode').text(order.code);
+      $('#detailAmount').text('$' + order.amount);
+      $('#detailCustomer').text(order.customer);
+      $('#detailAddress').text(order.address);
+      $('#detailCourier').text(order.courier);
+      $('#detailPayment').text(order.payment);
+      $('#detailDate').text(order.dateLabel);
+      $('#detailPaymentText').text(paymentText(order));
+      $('#detailStatusBadge')
+        .attr('class', 'px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] ' + statusBadgeClass(order.status))
+        .text(order.status.replaceAll('_', ' '));
+
+      const timeline = $('#detailTimeline');
+      timeline.empty();
+      order.timeline.forEach((step, index) => {
+        timeline.append(`
+          <div class="flex gap-3 items-start">
+            <div class="w-7 h-7 rounded-full text-dp-dark text-xs font-bold flex items-center justify-center mt-0.5 gold-button">${index + 1}</div>
+            <div>
+              <p class="text-white font-semibold text-sm">${step}</p>
+              <p class="text-white/55 text-xs mt-1">Recorded in order history</p>
+            </div>
+          </div>
+        `);
+      });
+    }
+
+    function makeCard(order) {
+      return $(`
+        <div class="order-card rounded-[1.5rem] border border-blue-100 bg-slate-50/70 p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+              <span class="text-lg font-bold text-dp-dark">${order.code}</span>
+              <span class="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-[0.18em] ${statusBadgeClass(order.status)}">${order.status.replaceAll('_', ' ')}</span>
+              <span class="px-3 py-1 rounded-full text-[11px] font-bold ${paymentBadgeClass(order.payment)}">${order.payment}</span>
+            </div>
+            <div class="flex flex-wrap gap-x-5 gap-y-2 text-sm text-dp-gray">
+              <span>Customer: ${order.customer}</span>
+              <span>Amount: $${order.amount}</span>
+              <span>Date: ${order.dateLabel}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 flex-wrap">
+            ${order.note ? `<span class="text-xs text-dp-gray">${order.note}</span>` : ''}
+            <button class="view-btn bg-dp-blue text-white px-5 py-3 rounded-2xl uppercase text-[11px] tracking-[0.2em] font-bold hover:bg-blue-700 transition-colors">View Details</button>
+          </div>
+        </div>
+      `).find('.view-btn').on('click', function () {
+        updateDetails(order);
+        document.getElementById('details').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }).end();
+    }
+
+    function sortOrders(list, mode) {
+      const copy = [...list];
+      if (mode === 'oldest') copy.sort((a, b) => a.dateRank - b.dateRank);
+      else if (mode === 'amount-high') copy.sort((a, b) => b.amount - a.amount);
+      else if (mode === 'amount-low') copy.sort((a, b) => a.amount - b.amount);
+      else copy.sort((a, b) => b.dateRank - a.dateRank);
+      return copy;
+    }
+
+    function classifyGroup(status) {
+      if (status === 'DELIVERED_PENDING' || status === 'SHIPPED') return 'Needs Attention';
+      if (status === 'CREATED' || status === 'ESCROW_FROZEN') return 'In Progress';
+      return 'Completed';
+    }
+
+    function updateStats() {
+      const earned = orders.filter(o => o.payment === 'Paid').reduce((sum, o) => sum + o.amount, 0);
+      const pending = orders.filter(o => o.payment === 'Protected' || o.payment === 'Waiting release').reduce((sum, o) => sum + o.amount, 0);
+      const completed = orders.filter(o => o.status === 'COMPLETED').length;
+      const active = orders.filter(o => !['COMPLETED', 'REFUNDED'].includes(o.status)).length;
+
+      $('#totalEarned').text('$' + earned);
+      $('#pendingEscrow').text('$' + pending);
+      $('#completedOrders').text(completed);
+
+      $('#heroEarned').text('$' + earned);
+      $('#heroPending').text('$' + pending);
+      $('#heroCompleted').text(completed);
+      $('#heroActive').text(active);
+    }
+
+    function renderOrders() {
+      const search = $('#searchInput').val().trim().toLowerCase();
+      const status = $('#statusFilter').val();
+      const sort = $('#sortFilter').val();
+
+      const filtered = orders.filter(order => {
+        const searchMatch = !search || order.code.toLowerCase().includes(search) || order.customer.toLowerCase().includes(search);
+        const statusMatch = status === 'all' || order.status === status;
+        return searchMatch && statusMatch;
+      });
+
+      const grouped = {
+        'Needs Attention': [],
+        'In Progress': [],
+        'Completed': []
+      };
+
+      sortOrders(filtered, sort).forEach(order => grouped[order.group].push(order));
+
+      const groupMap = {
+        'Needs Attention': $('#group-needs-attention'),
+        'In Progress': $('#group-in-progress'),
+        'Completed': $('#group-completed')
+      };
+
+      Object.entries(groupMap).forEach(([groupName, $container]) => {
+        $container.empty();
+        grouped[groupName].forEach(order => $container.append(makeCard(order)));
+
+        const $panel = $container.closest('.group-panel');
+        const countNum = grouped[groupName].length;
+        $panel.find('.group-count').text(`${countNum} Order${countNum === 1 ? '' : 's'}`);
+        $panel.toggleClass('hidden', countNum === 0);
+      });
+
+      $('#emptyState').toggleClass('hidden', filtered.length !== 0);
+      $('#visibleOrders').text(filtered.length);
+
+      updateStats();
+
+      if (orders.length === 0) {
+        clearDetails();
+      } else if (filtered.length > 0) {
+        updateDetails(sortOrders(filtered, sort)[0]);
+      }
+    }
+
+    function openModal() {
+      $('#createOrderModal').removeClass('hidden');
+      $('body').css('overflow', 'hidden');
+      updateJsonPreview();
+    }
+
+    function closeModal() {
+      $('#createOrderModal').addClass('hidden');
+      $('body').css('overflow', 'auto');
+      $('#formMessage').addClass('hidden').removeClass('bg-green-50 text-green-700 bg-red-50 text-red-700').text('');
+    }
+
+    function getFormData() {
+      return {
+        order_code: $('#orderCode').val().trim(),
+        customer_id: Number($('#customerId').val()),
+        merchant_id: Number($('#merchantId').val()),
+        courier_id: Number($('#courierId').val()),
+        amount: Number($('#amount').val()),
+        delivery_address: $('#deliveryAddress').val().trim()
+      };
+    }
+
+    function updateJsonPreview() {
+      $('#jsonPreview').text(JSON.stringify(getFormData(), null, 2));
+    }
+
+    function showMessage(text, isSuccess) {
+      $('#formMessage')
+        .removeClass('hidden bg-green-50 text-green-700 bg-red-50 text-red-700')
+        .addClass(isSuccess ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700')
+        .text(text);
+    }
+
+    $(document).ready(function () {
+      gsap.to('#loader-bar', {
+        width: '100%',
+        duration: 1.3,
+        ease: 'power2.inOut',
+        onComplete: function () {
+          gsap.to('#loader', {
+            yPercent: -100,
+            duration: 0.8,
+            ease: 'power4.inOut'
+          });
+
+          gsap.to('.hero-reveal', {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            stagger: 0.15,
+            ease: 'power3.out',
+            delay: 0.15
+          });
+        }
+      });
+
+      gsap.set('.hero-reveal', { y: 80, opacity: 0 });
+      gsap.registerPlugin(ScrollTrigger);
+
+      gsap.from('#overview .rounded-\\[1\\.75rem\\]', {
+        scrollTrigger: {
+          trigger: '#overview',
+          start: 'top 75%'
+        },
+        y: 40,
+        opacity: 0,
+        duration: 0.9,
+        stagger: 0.12,
+        ease: 'power3.out'
+      });
+
+      gsap.from('.group-panel', {
+        scrollTrigger: {
+          trigger: '#orders',
+          start: 'top 72%'
+        },
+        y: 40,
+        opacity: 0,
+        duration: 0.9,
+        stagger: 0.12,
+        ease: 'power3.out'
+      });
+
+      $(window).on('scroll', function () {
+        if ($(this).scrollTop() > 50) {
+          $('#navbar').addClass('bg-dp-dark/85 backdrop-blur-md py-3').removeClass('py-5');
+        } else {
+          $('#navbar').removeClass('bg-dp-dark/85 backdrop-blur-md py-3').addClass('py-5');
+        }
+
+        if ($(this).scrollTop() > 300) $('#scroll-top').addClass('visible');
+        else $('#scroll-top').removeClass('visible');
+      });
+
+      $('#scroll-top').on('click', function () {
+        $('html, body').animate({ scrollTop: 0 }, 500);
+        return false;
+      });
+
+      $('#searchInput').on('input', renderOrders);
+      $('#statusFilter').on('change', renderOrders);
+      $('#sortFilter').on('change', renderOrders);
+      $('#resetBtn').on('click', function () {
+        $('#searchInput').val('');
+        $('#statusFilter').val('all');
+        $('#sortFilter').val('newest');
+        renderOrders();
+      });
+
+      $('#openCreateOrderNav, #openCreateOrderHero').on('click', openModal);
+      $('#closeCreateOrder, #cancelCreateOrder, #modalBackdrop').on('click', closeModal);
+
+      $('#orderCode, #customerId, #merchantId, #courierId, #amount, #deliveryAddress').on('input', updateJsonPreview);
+
+      $('#fillDemoData').on('click', function () {
+        $('#orderCode').val('ORD-012');
+        $('#customerId').val('7');
+        $('#merchantId').val('91');
+        $('#courierId').val('12');
+        $('#amount').val('8000');
+        $('#deliveryAddress').val('TIZI OUZOU');
+        updateJsonPreview();
+      });
+
+      $('#createOrderForm').on('submit', function (e) {
+        e.preventDefault();
+
+        const formData = getFormData();
+
+        if (
+          !formData.order_code ||
+          !formData.customer_id ||
+          !formData.merchant_id ||
+          !formData.courier_id ||
+          !formData.amount ||
+          !formData.delivery_address
+        ) {
+          showMessage('Please fill all fields before submitting.', false);
+          return;
+        }
+
+        const newOrder = {
+          code: '#' + formData.order_code,
+          customer: 'Customer #' + formData.customer_id,
+          amount: formData.amount,
+          status: 'CREATED',
+          payment: 'Not secured',
+          dateLabel: 'Just now',
+          dateRank: Date.now(),
+          address: formData.delivery_address,
+          courier: 'Courier #' + formData.courier_id,
+          group: classifyGroup('CREATED'),
+          note: 'Newly created order',
+          timeline: ['Order created']
+        };
+
+        orders.unshift(newOrder);
+        renderOrders();
+        updateDetails(newOrder);
+        showMessage('Order created successfully. It now appears in the dashboard.', true);
+
+        setTimeout(() => {
+          closeModal();
+          $('#createOrderForm')[0].reset();
+          updateJsonPreview();
+        }, 1100);
+      });
+
+      renderOrders();
+      updateJsonPreview();
+      clearDetails();
+    });
+  </script>
+</body>
+</html>

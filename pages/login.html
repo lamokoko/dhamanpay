@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DhamanPay | Login</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;700;800&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+
+               'dp-dark': '#0b1f3a',
+            'dp-blue': '#1d4ed8',
+            'dp-blue-soft': '#dbeafe',
+            'dp-white': '#f8fbff',
+            'dp-gold': '#D4AF37',
+            'dp-gold-light': '#F7E7A1',
+            'dp-gold-soft': '#F8F0C8',
+            'dp-gold-deep': '#A87412',
+            'dp-gold-dark': '#6E4B0D',
+
+            'dp-green': '#16a34a',
+            'dp-green-soft': '#dcfce7',
+            'dp-gray': '#64748b'
+          },
+          fontFamily: {
+            sans: ['Manrope', 'sans-serif'],
+            display: ['Oswald', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      background: #0b1f3a;
+      color: #fff;
+      overflow-x: hidden;
+      font-family: 'Manrope', sans-serif;
+    }
+
+    .gold-metallic-text {
+      background: linear-gradient(90deg, #6E4B0D, #F7E7A1, #D4AF37);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gold-button {
+      background: linear-gradient(90deg, #6E4B0D, #F7E7A1, #D4AF37);
+      color: #0b1f3a;
+      transition: 0.3s;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .gold-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(212,175,55,0.4);
+    }
+
+    .gold-button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .glass-card {
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .logo-box {
+      border-radius: 2rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 40px;
+      text-align: center;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .hero-bg {
+      min-height: 100vh;
+      background: linear-gradient(
+        135deg,
+        #0d366b 0%,
+        #231c7c 40%,
+        #170b72 100%
+      );
+      display: flex;
+      align-items: center;
+    }
+
+    .loader {
+      position: fixed;
+      inset: 0;
+      background: #0d126c;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+      transition: transform 0.8s ease, opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+    .loader.hide {
+      transform: translateY(-100%);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-bar-bg {
+      width: 220px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.12);
+      margin-top: 18px;
+      overflow: hidden;
+      position: relative;
+      border-radius: 999px;
+    }
+
+    .loader-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #6E4B0D, #F7E7A1, #D4AF37);
+      position: absolute;
+      left: 0;
+      top: 0;
+      border-radius: 999px;
+      transition: width 1.2s ease;
+    }
+
+    input {
+      color: white;
+    }
+
+    input::placeholder {
+      color: rgba(255,255,255,0.55);
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(212,175,55,0.35);
+    }
+
+    @media (max-width: 1023px) {
+      .mobile-stack {
+        grid-template-columns: 1fr !important;
+      }
+
+      .mobile-center {
+        justify-content: center !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="loader" id="loader">
+    <div class="text-white font-display text-3xl tracking-[0.25em] uppercase">
+      Dhaman<span class="gold-metallic-text">Pay</span>
+    </div>
+    <div class="loader-bar-bg">
+      <div class="loader-bar" id="loader-bar"></div>
+    </div>
+  </div>
+
+  <section class="hero-bg">
+    <div class="max-w-7xl mx-auto w-full px-6 grid lg:grid-cols-[1fr_1fr] gap-12 items-center mobile-stack">
+
+      <div class="flex justify-center mobile-center">
+        <div class="logo-box">
+          <h1 class="text-6xl font-display tracking-widest">
+            Dhaman<span class="gold-metallic-text">Pay</span>
+          </h1>
+        </div>
+      </div>
+
+      <div class="flex justify-end mobile-center">
+        <div class="w-full max-w-md glass-card rounded-3xl p-8">
+
+          <h2 class="text-2xl font-display mb-6 text-center">
+            Login to <span class="gold-metallic-text">DhamanPay</span>
+          </h2>
+
+          <form id="loginForm" class="space-y-6">
+            <div>
+              <label class="text-sm mb-2 block">Phone</label>
+              <input
+                type="tel"
+                id="phone"
+                class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20"
+                placeholder="0557000101"
+              >
+            </div>
+
+            <div>
+              <label class="text-sm mb-2 block">Password</label>
+              <div class="relative">
+                <input
+                  type="password"
+                  id="password"
+                  class="w-full px-4 py-3 pr-12 rounded-xl bg-white/10 border border-white/20"
+                  placeholder="Enter password"
+                >
+                <button
+                  type="button"
+                  id="togglePass"
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-white/60"
+                >
+                  <i class="ph ph-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div id="msg" class="hidden text-sm rounded-xl px-3 py-2"></div>
+
+            <button id="loginBtn" type="submit" class="w-full py-3 rounded-xl gold-button uppercase text-sm">
+              Login
+            </button>
+          </form>
+
+          <p class="text-center mt-6 text-sm text-white/60">
+            Don't have an account?
+            <a href="loginn.html" class="text-yellow-400 font-bold">Register</a>
+          </p>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <script src="../js/api.js"></script>
+  
+<script>
+  
+    const loginForm = document.getElementById('loginForm');
+    const phoneInput = document.getElementById('phone');
+    const passwordInput = document.getElementById('password');
+    const msg = document.getElementById('msg');
+    const loginBtn = document.getElementById('loginBtn');
+    const togglePass = document.getElementById('togglePass');
+
+    function showMessage(text, type = 'error') {
+      msg.classList.remove('hidden', 'text-red-400', 'text-green-400', 'text-white/80');
+      if (type === 'success') {
+        msg.classList.add('text-green-400');
+      } else if (type === 'loading') {
+        msg.classList.add('text-white/80');
+      } else {
+        msg.classList.add('text-red-400');
+      }
+      msg.textContent = text;
+    }
+
+    togglePass.onclick = () => {
+      const hidden = passwordInput.type === 'password';
+      passwordInput.type = hidden ? 'text' : 'password';
+      togglePass.querySelector('i').className = hidden ? 'ph ph-eye-slash' : 'ph ph-eye';
+    };
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const phone = phoneInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!phone || !password) {
+        showMessage('Please fill in phone and password.');
+        return;
+      }
+
+      showMessage('Logging in...', 'loading');
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Loading...';
+
+      try {
+        const result = await loginUser(phone, password);
+
+        if (!result.token) {
+          throw new Error('No token returned from login.');
+        }
+
+        saveToken(result.token);
+          localStorage.setItem("DHAMANPAY_API_BASE","https://dhamanpay.onrender.com/api");
+        const me = await getMe();
+        const user = me.data || result.data;
+
+        if (!user || !user.role) {
+          throw new Error('Could not detect user role.');
+        }
+
+        showMessage(result.message || 'Login successful.', 'success');
+
+        if (user.role === 'merchant') {
+          window.location.href = 'merchant1.html';
+        } else if (user.role === 'customer') {
+          window.location.href = 'customer.html';
+        } else if (user.role === 'courier') {
+          window.location.href = 'courier.html';
+        } else if (user.role === 'admin') {
+          window.location.href = 'admin.html';
+        } else {
+          throw new Error('Unknown role returned by backend.');
+        }
+
+      } catch (error) {
+        showMessage(error.message || 'Login failed.');
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login';
+      }
+    });
+
+    window.addEventListener('load', function () {
+      const loader = document.getElementById('loader');
+      const bar = document.getElementById('loader-bar');
+
+      setTimeout(() => {
+        bar.style.width = '100%';
+      }, 100);
+
+      setTimeout(() => {
+        loader.classList.add('hide');
+      }, 1400);
+    });
+  </script>
+    <script src="api.js"></script>
+
+</body>
+</html>

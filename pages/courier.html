@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DhamanPay | Courier Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+ <script src="../js/api.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'dp-dark': '#0b1f3a',
+            'dp-blue': '#1d4ed8',
+            'dp-blue-soft': '#dbeafe',
+            'dp-white': '#f8fbff',
+            'dp-gold': '#D4AF37',
+            'dp-gold-light': '#F7E7A1',
+            'dp-gold-soft': '#F8F0C8',
+            'dp-gold-deep': '#A87412',
+            'dp-gold-dark': '#6E4B0D',
+            'dp-gray': '#64748b'
+          },
+          fontFamily: {
+            sans: ['Manrope', 'sans-serif'],
+            display: ['Oswald', 'sans-serif']
+          },
+          boxShadow: {
+            glow: '0 20px 60px rgba(29, 78, 216, 0.15)',
+            glowStrong: '0 25px 80px rgba(29, 78, 216, 0.22)',
+            goldGlow: '0 18px 45px rgba(212, 175, 55, 0.28)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Manrope', sans-serif;
+      background: #f8fbff;
+      color: #0b1f3a;
+      overflow: hidden;
+    }
+
+    .floating-orb {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(65px);
+      opacity: 0.28;
+      pointer-events: none;
+    }
+
+    .gold-metallic-text {
+      background: linear-gradient(90deg, #6E4B0D 0%, #B8860B 10%, #F7E7A1 22%, #C99700 34%, #5A3D0A 44%, #E7D37A 58%, #FFF4B5 70%, #B27A10 84%, #D4AF37 100%);
+      background-size: 220% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      animation: goldShift 6s linear infinite;
+    }
+
+    .gold-button {
+      background: linear-gradient(90deg, #6E4B0D 0%, #B8860B 12%, #F7E7A1 25%, #C99700 40%, #8B6508 54%, #F3E28E 68%, #B27A10 84%, #D4AF37 100%);
+      background-size: 220% auto;
+      color: #0b1f3a;
+      box-shadow: 0 14px 34px rgba(212,175,55,0.28);
+      transition: all 0.35s ease;
+    }
+
+    .gold-button:hover {
+      background-position: 100% center;
+      transform: translateY(-2px);
+      box-shadow: 0 18px 42px rgba(212,175,55,0.35);
+    }
+
+    .gold-soft-bg {
+      background: linear-gradient(90deg, rgba(110,75,13,0.10) 0%, rgba(212,175,55,0.20) 30%, rgba(247,231,161,0.28) 50%, rgba(168,116,18,0.18) 100%);
+    }
+
+    .gold-border {
+      border-color: rgba(212,175,55,0.22);
+    }
+
+    .loader {
+      position: fixed;
+      inset: 0;
+      background: #0b1f3a;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loader-bar-bg {
+      width: 220px;
+      height: 2px;
+      background: rgba(255,255,255,0.12);
+      margin-top: 18px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loader-bar {
+      width: 0%;
+      height: 100%;
+      background: #D4AF37;
+      position: absolute;
+      inset: 0 auto 0 0;
+    }
+
+    .custom-scroll::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #eff6ff;
+    }
+
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #1d4ed8;
+      border-radius: 999px;
+    }
+
+    .panel-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .panel-card:hover { transform: translateY(-2px); box-shadow: 0 18px 40px rgba(29,78,216,0.08); }
+
+    .view-nav-btn.active-nav { background: white; color: #0b1f3a; }
+
+    #views-track { width: 400vw; }
+    .view-panel { width: 100vw; height: 100%; flex-shrink: 0; }
+
+    .mini-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .pdf-dropzone.dragover {
+      border-color: #1d4ed8;
+      background: #eff6ff;
+    }
+
+    @keyframes goldShift {
+      to { background-position: 220% center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader" id="loader">
+    <div class="text-white font-display text-3xl tracking-[0.25em] uppercase">DhamanPay</div>
+    <div class="loader-bar-bg"><div class="loader-bar" id="loader-bar"></div></div>
+  </div>
+
+  <div class="min-h-screen bg-dp-dark text-white relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-dp-dark via-dp-blue/70 to-dp-dark"></div>
+    <div class="floating-orb w-72 h-72 top-10 left-10" style="background:#D4AF37;"></div>
+    <div class="floating-orb w-96 h-96 bottom-0 right-0" style="background:#1d4ed8;"></div>
+
+    <header class="fixed w-full top-0 z-50 py-5 px-6 md:px-10 text-white">
+      <div class="max-w-7xl mx-auto flex justify-between items-center gap-6">
+        <a href="#" class="text-2xl font-display font-bold tracking-[0.12em]">
+          <span class="text-white">DHAMAN</span><span class="gold-metallic-text">PAY</span>
+        </a>
+        <nav id="topViewNav" class="hidden md:flex items-center gap-3 flex-wrap justify-end"></nav>
+      </div>
+      <button id="logoutBtn" class="px-4 py-2 rounded-2xl border border-white/10 bg-white/5 text-white/80 uppercase text-[11px] tracking-[0.18em] font-bold hover:bg-white/10 transition-all">
+  Logout
+</button>
+    </header>
+
+    <main class="relative z-10 pt-24 h-screen overflow-hidden">
+      <div id="views-track" class="flex h-full transition-transform duration-500 ease-in-out">
+
+        <section id="home-view" class="view-panel overflow-y-auto custom-scroll">
+          <div class="min-h-full flex items-center px-6 md:px-10 py-10">
+            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-[1.1fr_0.95fr] gap-10 items-center">
+              <div>
+                <p class="hero-reveal uppercase tracking-[0.35em] text-dp-gold-light text-xs md:text-sm mb-5">Courier Dashboard</p>
+                <h1 class="hero-reveal font-display uppercase leading-none tracking-[0.06em] text-[3.2rem] md:text-[5.4rem] lg:text-[6rem] mb-6">
+                  <span class="text-white">Courier</span><br>
+                  <span class="gold-metallic-text">Operations</span>
+                </h1>
+                <p class="hero-reveal text-white/85 max-w-2xl leading-relaxed text-base md:text-lg">
+                  Main courier flow: ship the order, keep updating live position so the customer can track it, then submit a proof URL after the order reaches the shipped step.
+                </p>
+
+                <div class="hero-reveal grid sm:grid-cols-2 xl:grid-cols-2 gap-4 mt-10">
+                  <button class="home-nav-btn rounded-[1.75rem] border border-white/10 bg-white/10 backdrop-blur-md p-5 text-left hover:bg-white/15 transition-all" data-view="shipping-view">
+                    <i class="ph ph-truck text-3xl text-dp-gold-light"></i>
+                    <h3 class="mt-4 text-xl font-bold">Ship Order</h3>
+                    <p class="text-sm text-white/65 mt-2">Use the real order ID from your assigned orders, then start shipping when the order status is ESCROW_FROZEN.</p>
+                  </button>
+                  <button class="home-nav-btn rounded-[1.75rem] border border-white/10 bg-white/10 backdrop-blur-md p-5 text-left hover:bg-white/15 transition-all" data-view="proof-view">
+                    <i class="ph ph-file-pdf text-3xl text-dp-gold-light"></i>
+                    <h3 class="mt-4 text-xl font-bold">Submit Proof</h3>
+                    <p class="text-sm text-white/65 mt-2">Select a PDF locally for UI preview, then paste the uploaded proof URL required by the backend.</p>
+                  </button>
+                  <button class="home-nav-btn rounded-[1.75rem] border border-white/10 bg-white/10 backdrop-blur-md p-5 text-left hover:bg-white/15 transition-all" data-view="gps-view">
+                    <i class="ph ph-map-pin-line text-3xl text-dp-gold-light"></i>
+                    <h3 class="mt-4 text-xl font-bold">GPS Guide</h3>
+                    <p class="text-sm text-white/65 mt-2">Understand how browser GPS works in the interface. This section is visual only unless your backend adds GPS endpoints later.</p>
+                  </button>
+                  <button class="home-nav-btn rounded-[1.75rem] border border-white/10 bg-white/10 backdrop-blur-md p-5 text-left hover:bg-white/15 transition-all" data-view="profile-view">
+                    <i class="ph ph-user-circle text-3xl text-dp-gold-light"></i>
+                    <h3 class="mt-4 text-xl font-bold">Profile</h3>
+                    <p class="text-sm text-white/65 mt-2">Courier identity, delivery company, vehicle matricule, rating, and assigned order stats from backend data.</p>
+                  </button>
+                </div>
+              </div>
+
+              <div class="hero-reveal rounded-[2rem] border border-white/10 bg-white/10 backdrop-blur-md p-6 md:p-8 shadow-glow">
+                <div class="flex items-center justify-between mb-6">
+                 <div>
+  <p class="text-white/65 text-xs uppercase tracking-[0.25em] mb-2">Courier</p>
+  <h3 id="heroCourierName" class="text-white text-2xl font-display tracking-wide">Courier</h3>
+  <p id="heroCourierCompany" class="text-white/65 text-sm mt-2">Delivery Company</p>
+</div>
+                  <div class="w-14 h-14 rounded-2xl gold-soft-bg flex items-center justify-center text-dp-gold text-3xl border gold-border">
+                    <i class="ph-fill ph-user-circle"></i>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="rounded-2xl bg-white/10 p-5 border border-white/10">
+                    <p class="text-white/65 text-xs uppercase tracking-[0.2em]">Assigned Orders</p>
+                    <p id="heroAssigned" class="text-white text-3xl font-bold mt-3">0</p>
+                  </div>
+                  <div class="rounded-2xl bg-white/10 p-5 border border-white/10">
+                    <p class="text-white/65 text-xs uppercase tracking-[0.2em]">Live Status</p>
+                    <p id="heroStatus" class="text-white text-3xl font-bold mt-3">Online</p>
+                  </div>
+                  <div class="rounded-2xl bg-white/10 p-5 border border-white/10">
+                    <p class="text-white/65 text-xs uppercase tracking-[0.2em]">Delivered</p>
+                    <p id="heroDelivered" class="text-white text-3xl font-bold mt-3">0</p>
+                  </div>
+                  <div class="rounded-2xl bg-white/10 p-5 border border-white/10">
+                    <p class="text-white/65 text-xs uppercase tracking-[0.2em]">Rating</p>
+                    <p id="heroRating" class="text-white text-3xl font-bold mt-3">0.0</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="shipping-view" class="view-panel overflow-y-auto custom-scroll bg-dp-white text-dp-dark">
+          <div class="max-w-7xl mx-auto px-6 md:px-10 py-28">
+            <div class="mb-8">
+              <p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Shipping Slide</p>
+              <h2 class="text-4xl font-display uppercase">Ship an Order</h2>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-[1.08fr_0.92fr] gap-8 items-start">
+              <div class="space-y-6">
+                <div class="rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow panel-card">
+                  <div class="flex items-center justify-between gap-4 flex-wrap mb-6">
+                    <div>
+                      <p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Order Preparation</p>
+                      <h2 class="text-2xl font-display uppercase text-dp-dark">Shipping Information</h2>
+                    </div>
+                    <span class="mini-badge gold-soft-bg text-dp-gold-dark">Main Operation</span>
+                  </div>
+
+                  <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm font-semibold text-dp-dark mb-2">Courier ID</label>
+                      <input id="shipCourierId" type="text" placeholder="Loaded from backend profile" readonly class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 text-dp-dark opacity-70 cursor-not-allowed">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-semibold text-dp-dark mb-2">Order ID</label>
+                      <input id="shipOrderCode" type="text" placeholder="Enter real order ID" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-semibold text-dp-dark mb-2">Pickup Place</label>
+                      <input id="shipFromText" type="text" placeholder="Store / warehouse / street" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-semibold text-dp-dark mb-2">Destination</label>
+                      <input id="shipToText" type="text" placeholder="Customer address" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-semibold text-dp-dark mb-2">From Latitude</label>
+                      <input id="fromLat" type="number" step="any" placeholder="36.7538" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-semibold text-dp-dark mb-2">From Longitude</label>
+                      <input id="fromLng" type="number" step="any" placeholder="3.0588" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-semibold text-dp-dark mb-2">Destination Latitude</label>
+                      <input id="toLat" type="number" step="any" placeholder="36.7140" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-semibold text-dp-dark mb-2">Destination Longitude</label>
+                      <input id="toLng" type="number" step="any" placeholder="3.1890" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark">
+                    </div>
+                  </div>
+
+                  <div class="grid sm:grid-cols-3 gap-3 mt-5">
+                    <button id="capturePickupGpsBtn" class="bg-dp-blue text-white px-5 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold hover:bg-blue-700 transition-colors">Use My GPS for Pickup</button>
+                    <button id="captureLiveGpsBtn" class="bg-white border border-blue-100 text-dp-dark px-5 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold hover:bg-blue-50 transition-colors">Capture Current Position</button>
+                    <button id="startShippingBtn" class="gold-button px-5 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold">Start Shipping</button>
+                  </div>
+
+                  <div id="shippingMessage" class="hidden mt-4 rounded-2xl p-4 text-sm"></div>
+                </div>
+
+                <div class="rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow panel-card">
+                  <div class="flex items-center justify-between gap-4 flex-wrap mb-6">
+                    <div>
+                      <p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Live Tracking</p>
+                      <h2 class="text-2xl font-display uppercase text-dp-dark">Update Position</h2>
+                    </div>
+                    <i class="ph ph-navigation-arrow text-3xl text-dp-blue"></i>
+                  </div>
+
+                  <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm font-semibold text-dp-dark mb-2">Current Latitude</label>
+                      <input id="liveLat" type="number" step="any" placeholder="36.7500" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-semibold text-dp-dark mb-2">Current Longitude</label>
+                      <input id="liveLng" type="number" step="any" placeholder="3.0800" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark">
+                    </div>
+                    <div class="md:col-span-2">
+                      <label class="block text-sm font-semibold text-dp-dark mb-2">Status Update</label>
+                      <select id="liveStatus" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 text-dp-dark">
+                        <option value="Picked Up">Picked Up</option>
+                        <option value="On The Way">On The Way</option>
+                        <option value="Near Destination">Near Destination</option>
+                        <option value="Arrived">Arrived</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="grid sm:grid-cols-3 gap-3 mt-5">
+                    <button id="useBrowserLiveGpsBtn" class="bg-dp-blue text-white px-5 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold hover:bg-blue-700 transition-colors">Use My Live GPS</button>
+                    <button id="pushLocationBtn" class="gold-button px-5 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold">Push Position Update</button>
+                    <button id="autoSimulateBtn" class="bg-white border border-blue-100 text-dp-dark px-5 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold hover:bg-blue-50 transition-colors">Simulate Progress</button>
+                  </div>
+
+                  <div id="positionMessage" class="hidden mt-4 rounded-2xl p-4 text-sm"></div>
+                </div>
+              </div>
+
+              <div class="rounded-[2rem] bg-dp-dark text-white p-6 md:p-7 shadow-glowStrong border border-white/10">
+                <div class="flex justify-between items-start gap-4 mb-6">
+                  <div>
+                    <p class="text-white/60 uppercase tracking-[0.25em] text-xs mb-2">Shipping Preview</p>
+                    <h3 id="previewOrderTitle" class="text-3xl font-display">No Shipment Started</h3>
+                  </div>
+                  <span id="previewShipBadge" class="px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-white/10 text-white">Waiting</span>
+                </div>
+
+                <div class="space-y-4 text-sm">
+                  <div class="rounded-[1.5rem] bg-white/5 border border-white/10 p-5">
+                    <p class="text-white/70 uppercase tracking-[0.2em] text-xs mb-4">Route Summary</p>
+                    <div class="grid grid-cols-2 gap-4">
+                      <div><p class="text-white/50 mb-1">Pickup</p><p id="previewFromText" class="font-bold text-white">—</p></div>
+                      <div><p class="text-white/50 mb-1">Destination</p><p id="previewToText" class="font-bold text-white">—</p></div>
+                      <div><p class="text-white/50 mb-1">From GPS</p><p id="previewFromGps" class="font-bold text-white">—</p></div>
+                      <div><p class="text-white/50 mb-1">To GPS</p><p id="previewToGps" class="font-bold text-white">—</p></div>
+                    </div>
+                  </div>
+
+                  <div class="rounded-[1.5rem] bg-white/5 border border-white/10 p-5">
+                    <p class="text-white/70 uppercase tracking-[0.2em] text-xs mb-4">Customer Tracking View</p>
+                    <div class="space-y-3">
+                      <div>
+                        <p class="text-white/50 mb-1">Current Status</p>
+                        <p id="customerStatus" class="font-bold text-dp-gold-light">Waiting for shipment</p>
+                      </div>
+                      <div>
+                        <p class="text-white/50 mb-1">Last Position</p>
+                        <p id="customerPosition" class="font-bold text-white">—</p>
+                      </div>
+                      <div>
+                        <p class="text-white/50 mb-1">Last Updated</p>
+                        <p id="customerUpdatedAt" class="font-bold text-white">—</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rounded-[1.5rem] gold-soft-bg border gold-border p-4 text-sm text-white/90">
+                    The backend gets the courier identity from the logged-in token. Do not type random courier IDs. Ship works only for orders in ESCROW_FROZEN, and proof works only for orders in SHIPPED.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="proof-view" class="view-panel overflow-y-auto custom-scroll bg-dp-white text-dp-dark">
+          <div class="max-w-6xl mx-auto px-6 md:px-10 py-28">
+            <div class="mb-8">
+              <p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Proof Slide</p>
+              <h2 class="text-4xl font-display uppercase">Submit Proof of Shipping</h2>
+            </div>
+
+            <div class="grid lg:grid-cols-[1fr_0.95fr] gap-8">
+              <div class="rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow panel-card">
+                <div class="flex items-center justify-between gap-4 flex-wrap mb-6">
+                  <div>
+                    <p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Delivery Completion</p>
+                    <h2 class="text-2xl font-display uppercase text-dp-dark">Proof Upload</h2>
+                  </div>
+                  <i class="ph ph-seal-check text-3xl text-dp-blue"></i>
+                </div>
+
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-semibold text-dp-dark mb-2">Order ID</label>
+                    <input id="proofOrderCode" type="text" placeholder="Enter real shipped order ID" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark">
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-semibold text-dp-dark mb-2">Proof Kind</label>
+                    <select id="proofKind" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 text-dp-dark">
+                      <option value="Customer Signature">Customer Signature</option>
+                      <option value="Picture of Package">Picture of Package</option>
+                      <option value="Picture with Customer">Picture with Customer</option>
+                      <option value="Delivery Receipt">Delivery Receipt</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-semibold text-dp-dark mb-2">Proof Description</label>
+                    <textarea id="proofDescription" rows="5" placeholder="Explain what this proof contains and when it was collected..." class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark"></textarea>
+                  </div>
+
+                  <div id="pdfDropzone" class="pdf-dropzone rounded-[1.75rem] border-2 border-dashed border-blue-200 bg-slate-50 p-8 text-center transition-all">
+                    <i class="ph ph-file-pdf text-5xl text-dp-blue"></i>
+                    <p class="text-lg font-bold mt-4">Select PDF For UI Preview</p>
+                    <p class="text-sm text-dp-gray mt-2">Backend does not accept raw PDF upload here. It needs a proof_url.</p>
+                    <input id="proofPdf" type="file" accept="application/pdf" class="hidden">
+                    <button id="choosePdfBtn" type="button" class="mt-5 bg-dp-blue text-white px-5 py-3 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold hover:bg-blue-700 transition-colors">Choose PDF</button>
+                    <p id="pdfFileName" class="text-sm text-dp-gray mt-4">No PDF selected.</p>
+                  </div>
+
+                  <button id="submitProofBtn" class="gold-button px-6 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold">Submit Proof</button>
+                  <div id="proofMessage" class="hidden rounded-2xl p-4 text-sm"></div>
+                </div>
+              </div>
+
+              <div class="rounded-[2rem] bg-dp-dark text-white p-6 md:p-7 shadow-glowStrong border border-white/10">
+                <div class="flex justify-between items-start gap-4 mb-6">
+                  <div>
+                    <p class="text-white/60 uppercase tracking-[0.25em] text-xs mb-2">Latest Proof</p>
+                    <h3 id="proofPreviewTitle" class="text-3xl font-display">No Proof Yet</h3>
+                  </div>
+                  <span id="proofPreviewBadge" class="px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-white/10 text-white">Pending</span>
+                </div>
+
+                <div class="space-y-4 text-sm">
+                  <div class="rounded-[1.5rem] bg-white/5 border border-white/10 p-5">
+                    <p class="text-white/70 uppercase tracking-[0.2em] text-xs mb-4">Proof Details</p>
+                    <div class="space-y-3">
+                      <div><p class="text-white/50 mb-1">Order</p><p id="proofPrevOrder" class="font-bold text-white">—</p></div>
+                      <div><p class="text-white/50 mb-1">Kind</p><p id="proofPrevKind" class="font-bold text-white">—</p></div>
+                      <div><p class="text-white/50 mb-1">PDF File</p><p id="proofPrevFile" class="font-bold text-white">—</p></div>
+                      <div><p class="text-white/50 mb-1">Description</p><p id="proofPrevDesc" class="font-bold text-dp-gold-light">—</p></div>
+                    </div>
+                  </div>
+
+                  <div class="rounded-[1.5rem] gold-soft-bg border gold-border p-4 text-sm text-white/90">
+                    On submit, the interface will ask you for the uploaded proof URL because the backend proof endpoint expects <strong>proof_url</strong>, not the PDF file itself.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="gps-view" class="view-panel overflow-y-auto custom-scroll bg-dp-white text-dp-dark">
+          <div class="max-w-6xl mx-auto px-6 md:px-10 py-28">
+            <div class="mb-8">
+              <p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">GPS Slide</p>
+              <h2 class="text-4xl font-display uppercase">How GPS Insertion Works</h2>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+              <div class="rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow">
+                <p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Step by Step</p>
+                <h3 class="text-2xl font-display uppercase text-dp-dark mb-6">Insert Position</h3>
+                <div class="space-y-5 text-sm text-dp-dark">
+                  <div class="flex gap-3 items-start"><div class="w-8 h-8 rounded-full gold-button text-xs font-bold flex items-center justify-center">1</div><p>When the courier opens the shipping form, the page can call <code>navigator.geolocation.getCurrentPosition()</code> to read the device latitude and longitude.</p></div>
+                  <div class="flex gap-3 items-start"><div class="w-8 h-8 rounded-full gold-button text-xs font-bold flex items-center justify-center">2</div><p>These values can fill the visual pickup and live-tracking fields in the current interface.</p></div>
+                  <div class="flex gap-3 items-start"><div class="w-8 h-8 rounded-full gold-button text-xs font-bold flex items-center justify-center">3</div><p>The current documented backend does not expose a GPS tracking endpoint, so this section works as UI guidance and local preview only.</p></div>
+                  <div class="flex gap-3 items-start"><div class="w-8 h-8 rounded-full gold-button text-xs font-bold flex items-center justify-center">4</div><p>If you add GPS endpoints later, you can connect this same layout to live tracking without redesigning the dashboard.</p></div>
+                </div>
+              </div>
+
+              <div class="rounded-[2rem] bg-dp-dark text-white p-6 shadow-glowStrong border border-white/10">
+                <p class="text-white/60 uppercase tracking-[0.25em] text-xs mb-2">Recommended Data Model</p>
+                <h3 class="text-2xl font-display mb-6">Shipment Payload</h3>
+                <pre class="rounded-[1.5rem] bg-white/5 border border-white/10 p-5 overflow-x-auto text-xs leading-6 text-white/90">{
+  "orderId": 45,
+  "pickup": {
+    "label": "Hydra Warehouse",
+    "lat": 36.7538,
+    "lng": 3.0588
+  },
+  "destination": {
+    "label": "Customer Home",
+    "lat": 36.7140,
+    "lng": 3.1890
+  },
+  "liveTracking": {
+    "status": "On The Way",
+    "lat": 36.7401,
+    "lng": 3.1102,
+    "updatedAt": "2026-04-20T12:35:00Z"
+  },
+  "proof": {
+    "pdfUrl": "https://example.com/proof.pdf"
+  }
+}</pre>
+                <div class="rounded-[1.5rem] gold-soft-bg border gold-border p-4 text-sm text-white/90 mt-5">
+                  This payload is for future extension. Your current backend courier flow only requires the real order ID for ship and a <code>proof_url</code> for proof submission.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="profile-view" class="view-panel overflow-y-auto custom-scroll bg-dp-white text-dp-dark">
+          <div class="max-w-6xl mx-auto px-6 md:px-10 py-28">
+            <div class="mb-8">
+              <p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Profile Slide</p>
+              <h2 class="text-4xl font-display uppercase">Courier Profile</h2>
+            </div>
+            <div class="grid lg:grid-cols-[0.9fr_1.1fr] gap-8">
+             <div class="rounded-[2rem] bg-dp-dark text-white p-8 shadow-glowStrong border border-white/10">
+  <div class="w-20 h-20 rounded-3xl gold-soft-bg flex items-center justify-center text-dp-gold text-5xl border gold-border mb-6">
+    <i class="ph-fill ph-user-circle"></i>
+  </div>
+  <h3 id="profileName" class="text-3xl font-display">Courier</h3>
+  <p id="profileRole" class="text-white/60 mt-2">Courier Account</p>
+  <div class="mt-8 space-y-4 text-sm">
+    <div><span class="text-white/50">Email:</span> <span id="profileEmail" class="font-semibold">—</span></div>
+    <div><span class="text-white/50">Phone:</span> <span id="profilePhone" class="font-semibold">—</span></div>
+    <div><span class="text-white/50">Courier ID:</span> <span id="profileCourierId" class="font-semibold">—</span></div>
+  </div>
+</div>
+
+              <div class="space-y-6">
+                <div class="rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow">
+                  <p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Account Status</p>
+                  <h3 class="text-2xl font-display uppercase mb-5">Performance</h3>
+                  <div class="w-full h-3 rounded-full bg-blue-50 overflow-hidden mb-3">
+                    <div class="h-full w-[92%] rounded-full bg-dp-blue"></div>
+                  </div>
+                  <p class="text-sm text-dp-gray">Backend-driven courier performance overview</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                  <div class="rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow">
+                    <p class="text-dp-gray text-sm">Vehicle</p>
+                    <p id="profileVehicle" class="text-4xl font-extrabold mt-3 text-dp-dark">—</p>
+                  </div>
+                  <div class="rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow">
+                    <p class="text-dp-gray text-sm">Delivery Company</p>
+                    <p id="profileCompany" class="text-4xl font-extrabold mt-3 text-dp-blue">—</p>
+                  </div>
+                  <div class="rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow">
+                    <p class="text-dp-gray text-sm">Delivered</p>
+                    <p id="profileDeliveredToday" class="text-4xl font-extrabold mt-3 text-dp-dark">0</p>
+                  </div>
+                  <div class="rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow">
+                    <p class="text-dp-gray text-sm">Rating</p>
+                    <p id="profileRating" class="text-4xl font-extrabold mt-3 text-dp-blue">0.0</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+ <script>
+(function () {
+  const viewOrder = ['home-view', 'shipping-view', 'proof-view', 'gps-view', 'profile-view'];
+  let currentCourier = null;
+
+  function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value ?? '—';
+  }
+
+  async function loadMeData() {
+    try {
+      const res = await getMe();
+      currentCourier = res.data || {};
+
+      console.log('COURIER DATA:', currentCourier);
+
+      setText('heroCourierName', currentCourier.full_name);
+      setText('heroCourierCompany', currentCourier.delivery_company);
+
+      setText('profileName', currentCourier.full_name);
+      setText('profileRole', currentCourier.role ? currentCourier.role.toUpperCase() : 'COURIER');
+      setText('profileEmail', currentCourier.email);
+      setText('profilePhone', currentCourier.phone);
+      setText('profileCourierId', currentCourier.id);
+      setText('profileVehicle', currentCourier.vehicle_matricule);
+      setText('profileCompany', currentCourier.delivery_company);
+
+      const rating = Number(currentCourier.rating || 0).toFixed(1);
+      setText('profileRating', rating);
+      setText('heroRating', rating);
+
+      const courierIdInput = document.getElementById('shipCourierId');
+      if (courierIdInput) courierIdInput.value = currentCourier.id ?? '';
+    } catch (err) {
+      console.error('Failed to load courier /me:', err);
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    window.location.href = 'login.html';
+  }
+
+  function buildTopNav() {
+    const items = [
+      ['home-view', 'Home'],
+      ['shipping-view', 'Shipping'],
+      ['proof-view', 'Proof'],
+      ['gps-view', 'GPS'],
+      ['profile-view', 'Profile']
+    ];
+
+    const nav = document.getElementById('topViewNav');
+    if (!nav) return;
+
+    nav.innerHTML = items.map(([id, label]) =>
+      `<button class="view-nav-btn px-4 py-2 rounded-2xl border border-white/10 bg-white/5 text-white/80 uppercase text-[11px] tracking-[0.18em] font-bold hover:bg-white/10 transition-all" data-view="${id}">${label}</button>`
+    ).join('');
+  }
+
+  function setActiveNav(viewId) {
+    document.querySelectorAll('.view-nav-btn').forEach(btn => btn.classList.remove('active-nav'));
+    const active = document.querySelector(`.view-nav-btn[data-view="${viewId}"]`);
+    if (active) active.classList.add('active-nav');
+  }
+
+  function goToView(viewId) {
+    const index = viewOrder.indexOf(viewId);
+    if (index === -1) return;
+    const track = document.getElementById('views-track');
+    if (track) track.style.transform = `translateX(-${index * 100}vw)`;
+    setActiveNav(viewId);
+  }
+
+  document.addEventListener('click', function (e) {
+    const navBtn = e.target.closest('.view-nav-btn');
+    if (navBtn) goToView(navBtn.dataset.view);
+
+    const homeBtn = e.target.closest('.home-nav-btn');
+    if (homeBtn) goToView(homeBtn.dataset.view);
+  });
+
+  document.addEventListener('DOMContentLoaded', async function () {
+    if (!getToken()) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    buildTopNav();
+    goToView('home-view');
+    await loadMeData();
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
+
+    if (window.gsap) {
+      gsap.set('.hero-reveal', { y: 60, opacity: 0 });
+      gsap.to('#loader-bar', {
+        width: '100%',
+        duration: 1.2,
+        ease: 'power2.inOut',
+        onComplete: function () {
+          gsap.to('#loader', {
+            yPercent: -100,
+            duration: 0.8,
+            ease: 'power4.inOut'
+          });
+          gsap.to('.hero-reveal', {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            stagger: 0.12,
+            ease: 'power3.out',
+            delay: 0.15
+          });
+        }
+      });
+    }
+  });
+})();
+</script>
+  <script src="../js/courier.js"></script>
+</body>
+</html>

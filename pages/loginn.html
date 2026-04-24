@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DhamanPay | System Access</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;700;800&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../js/api.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'dp-dark': '#0b1f3a',
+            'dp-blue': '#1d4ed8',
+            'dp-blue-soft': '#dbeafe',
+            'dp-white': '#f8fbff',
+            'dp-gold': '#D4AF37',
+            'dp-gold-light': '#F7E7A1',
+            'dp-gold-soft': '#F8F0C8',
+            'dp-gold-deep': '#A87412',
+            'dp-gold-dark': '#6E4B0D',
+            'dp-green': '#16a34a',
+            'dp-gray': '#64748b'
+          },
+          fontFamily: {
+            sans: ['Manrope', 'sans-serif'],
+            display: ['Oswald', 'sans-serif']
+          },
+          boxShadow: {
+            glow: '0 20px 60px rgba(29, 78, 216, 0.15)',
+            goldGlow: '0 18px 45px rgba(212, 175, 55, 0.28)',
+            goldGlowStrong: '0 24px 80px rgba(212, 175, 55, 0.22)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background: #f8fbff;
+      color: #0b1f3a;
+      overflow-x: hidden;
+      font-family: 'Manrope', sans-serif;
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #eff6ff; }
+    ::-webkit-scrollbar-thumb {
+      background: #1d4ed8;
+      border-radius: 999px;
+    }
+
+    .loader {
+      position: fixed;
+      inset: 0;
+      background: #0b1f3a;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.8s ease-in-out;
+    }
+
+    .loader-bar-bg {
+      width: 220px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.12);
+      margin-top: 18px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loader-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #6E4B0D 0%, #F7E7A1 50%, #D4AF37 100%);
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .hero-grid::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: linear-gradient(to bottom, black, transparent);
+      pointer-events: none;
+    }
+
+    .strength-bar {
+      height: 8px;
+      border-radius: 999px;
+      transition: all 0.3s ease;
+    }
+
+    .floating-orb {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(65px);
+      opacity: 0.34;
+      pointer-events: none;
+    }
+
+    .gold-metallic-text {
+      background: linear-gradient(
+        90deg,
+        #6E4B0D 0%,
+        #B8860B 10%,
+        #F7E7A1 22%,
+        #C99700 34%,
+        #5A3D0A 44%,
+        #E7D37A 58%,
+        #FFF4B5 70%,
+        #B27A10 84%,
+        #D4AF37 100%
+      );
+      background-size: 220% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      animation: goldShift 6s linear infinite;
+      text-shadow: 0 0 20px rgba(212,175,55,0.08);
+    }
+
+    .gold-button {
+      background: linear-gradient(
+        90deg,
+        #6E4B0D 0%,
+        #B8860B 12%,
+        #F7E7A1 25%,
+        #C99700 40%,
+        #8B6508 54%,
+        #F3E28E 68%,
+        #B27A10 84%,
+        #D4AF37 100%
+      );
+      background-size: 220% auto;
+      color: #0b1f3a;
+      box-shadow: 0 14px 34px rgba(212,175,55,0.28);
+      transition: all 0.35s ease;
+    }
+
+    .gold-button:hover {
+      background-position: 100% center;
+      transform: translateY(-2px);
+      box-shadow: 0 18px 42px rgba(212,175,55,0.35);
+    }
+
+    .gold-soft-bg {
+      background: linear-gradient(
+        135deg,
+        rgba(247,231,161,0.14) 0%,
+        rgba(212,175,55,0.08) 55%,
+        rgba(168,116,18,0.06) 100%
+      );
+    }
+
+    .gold-accent-border {
+      border-color: rgba(212,175,55,0.22);
+    }
+
+    .logo-wrap {
+      min-height: 520px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-box {
+      width: 100%;
+      max-width: 500px;
+      min-height: 360px;
+      border-radius: 2rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 25% 25%, rgba(247,231,161,0.18), transparent 30%),
+        radial-gradient(circle at 70% 70%, rgba(212,175,55,0.16), transparent 28%);
+      pointer-events: none;
+    }
+
+    .logo-text {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      line-height: 0.95;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: white;
+      position: relative;
+      z-index: 1;
+    }
+
+    .role-dropdown {
+      position: relative;
+    }
+
+    .role-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      width: 100%;
+      background: white;
+      border: 1px solid rgba(212,175,55,0.22);
+      border-radius: 1.25rem;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+      padding: 10px;
+      z-index: 40;
+      display: none;
+    }
+
+    .role-menu.show { display: block; }
+
+    .role-option {
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 1rem;
+      font-weight: 700;
+      color: #0b1f3a;
+      transition: 0.2s ease;
+    }
+
+    .role-option:hover {
+      background: linear-gradient(
+        90deg,
+        rgba(247,231,161,0.18) 0%,
+        rgba(212,175,55,0.10) 100%
+      );
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 1rem;
+      background: white;
+      border: 1px solid #dbeafe;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.2);
+      border-color: #1d4ed8;
+    }
+
+    @keyframes goldShift {
+      to { background-position: 220% center; }
+    }
+  </style>
+</head>
+
+<body class="text-dp-dark antialiased">
+  <div class="loader" id="loader">
+    <div class="text-white font-display text-3xl tracking-[0.25em] uppercase">DhamanPay</div>
+    <div class="loader-bar-bg">
+      <div class="loader-bar" id="loader-bar"></div>
+    </div>
+  </div>
+
+  <header class="fixed top-0 left-0 w-full z-50 py-5 px-6 md:px-10">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <a href="#" class="text-2xl font-display font-bold tracking-[0.08em] text-white">
+        Dhaman<span class="gold-metallic-text">Pay</span>
+      </a>
+      <div class="hidden md:flex items-center gap-4 text-white/80 text-sm">
+        <span class="uppercase tracking-[0.2em]">System Access</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="relative min-h-screen bg-dp-dark overflow-hidden hero-grid flex items-center pt-28 pb-16">
+    <div class="absolute inset-0 bg-gradient-to-br from-dp-dark via-dp-blue/70 to-dp-dark"></div>
+    <div class="floating-orb w-80 h-80 -top-10 -left-10" style="background:#D4AF37;"></div>
+    <div class="floating-orb w-96 h-96 bottom-0 right-0" style="background:#1d4ed8;"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full grid grid-cols-1 lg:grid-cols-[0.85fr_1.15fr] gap-12 items-center">
+      <div class="hero-reveal logo-wrap">
+        <div class="logo-box">
+          <div class="logo-text">
+            <span class="text-white">Dhaman</span><span class="gold-metallic-text">Pay</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-reveal rounded-[2rem] bg-white border gold-accent-border shadow-goldGlow overflow-hidden">
+        <div class="bg-dp-dark text-white px-6 md:px-8 py-6">
+          <p class="text-blue-200 uppercase tracking-[0.2em] text-xs mb-2">Access Portal</p>
+          <h2 class="text-3xl font-display">Create Your Account</h2>
+        </div>
+
+        <form id="systemAccessForm" class="p-6 md:p-8 space-y-6 gold-soft-bg">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm font-semibold mb-2">First Name</label>
+              <input id="firstName" type="text" placeholder="Your first name">
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">Family Name</label>
+              <input id="familyName" type="text" placeholder="Your family name">
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold mb-2">Email</label>
+              <input id="email" type="email" placeholder="example@email.com">
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold mb-2">Phone Number</label>
+              <input id="phone" type="tel" placeholder="0557000101">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold mb-3">Choose Role</label>
+            <div class="role-dropdown">
+              <button type="button" id="roleToggle"
+                class="w-full flex items-center justify-between px-4 py-4 rounded-2xl bg-white border gold-accent-border font-bold text-dp-dark hover:border-dp-gold transition">
+                <span id="selectedRoleText">Select a role</span>
+                <i class="ph ph-caret-down text-lg"></i>
+              </button>
+
+              <div id="roleMenu" class="role-menu">
+                <button type="button" class="role-option" data-role="merchant">Merchant</button>
+                <button type="button" class="role-option" data-role="customer">Customer</button>
+                <button type="button" class="role-option" data-role="courier">Courier</button>
+                <button type="button" class="role-option" data-role="admin">Admin</button>
+              </div>
+            </div>
+            <input type="hidden" id="role" value="">
+          </div>
+
+          <div id="roleFields" class="hidden rounded-[1.75rem] bg-white border gold-accent-border p-5 space-y-4"></div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm font-semibold mb-2">Create Password</label>
+              <div class="relative">
+                <input id="password" type="password" placeholder="Create a strong password" class="pr-12">
+                <button type="button" id="togglePassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-dp-gray">
+                  <i class="ph ph-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">Confirm Password</label>
+              <div class="relative">
+                <input id="confirmPassword" type="password" placeholder="Confirm password" class="pr-12">
+                <button type="button" id="toggleConfirmPassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-dp-gray">
+                  <i class="ph ph-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-[1.5rem] bg-white border gold-accent-border p-4">
+            <div class="flex items-center justify-between gap-4 mb-3">
+              <p class="text-sm font-semibold">Password Strength</p>
+              <span id="strengthLabel" class="text-xs font-bold uppercase tracking-[0.2em] text-dp-gray">Weak</span>
+            </div>
+            <div class="grid grid-cols-4 gap-2 mb-4">
+              <div id="bar1" class="strength-bar bg-slate-200"></div>
+              <div id="bar2" class="strength-bar bg-slate-200"></div>
+              <div id="bar3" class="strength-bar bg-slate-200"></div>
+              <div id="bar4" class="strength-bar bg-slate-200"></div>
+            </div>
+            <ul class="text-sm text-dp-gray space-y-1">
+              <li id="ruleLength">• At least 8 characters</li>
+              <li id="ruleUpper">• Include an uppercase letter</li>
+              <li id="ruleNumber">• Include a number</li>
+              <li id="ruleSpecial">• Include a special character</li>
+            </ul>
+          </div>
+
+          <div id="formMessage" class="hidden rounded-2xl p-4 text-sm"></div>
+
+          <div class="flex flex-col sm:flex-row gap-3 pt-2">
+            <button id="submitBtn" type="submit" class="gold-button px-6 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold">
+              Create Account
+            </button>
+            <button type="reset" class="bg-white text-dp-dark border gold-accent-border px-6 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold hover:bg-slate-50 transition-colors">
+              Reset
+            </button>
+          </div>
+
+          <p class="text-center text-sm text-dp-gray pt-2">
+            Already have an account?
+            <a href="login.html" class="text-dp-blue font-bold">Login</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- If api.js is in the same folder, keep this -->
+  <script src="api.js"></script>
+
+  <script>
+    function renderRoleFields(role) {
+      const roleFields = document.getElementById('roleFields');
+
+      const templates = {
+        merchant: `
+          <div>
+            <p class="text-xs uppercase tracking-[0.2em] text-dp-gray mb-3">Merchant Information</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-sm font-semibold mb-2">Store Name</label>
+                <input id="merchantStoreName" type="text" placeholder="Your store name">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold mb-2">Commercial Register</label>
+                <input id="merchantCommercialRegister" type="text" placeholder="RC123456789">
+              </div>
+            </div>
+          </div>
+        `,
+        customer: `
+          <div>
+            <p class="text-xs uppercase tracking-[0.2em] text-dp-gray mb-3">Customer Information</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-sm font-semibold mb-2">Wilaya</label>
+                <select id="customerWilaya">
+                  <option value="">Select your wilaya</option>
+                  <option value="Adrar">Adrar</option>
+                  <option value="Chlef">Chlef</option>
+                  <option value="Laghouat">Laghouat</option>
+                  <option value="Oum El Bouaghi">Oum El Bouaghi</option>
+                  <option value="Batna">Batna</option>
+                  <option value="Béjaïa">Béjaïa</option>
+                  <option value="Biskra">Biskra</option>
+                  <option value="Béchar">Béchar</option>
+                  <option value="Blida">Blida</option>
+                  <option value="Bouira">Bouira</option>
+                  <option value="Tamanrasset">Tamanrasset</option>
+                  <option value="Tébessa">Tébessa</option>
+                  <option value="Tlemcen">Tlemcen</option>
+                  <option value="Tiaret">Tiaret</option>
+                  <option value="Tizi Ouzou">Tizi Ouzou</option>
+                  <option value="Algiers">Algiers</option>
+                  <option value="Djelfa">Djelfa</option>
+                  <option value="Jijel">Jijel</option>
+                  <option value="Sétif">Sétif</option>
+                  <option value="Saïda">Saïda</option>
+                  <option value="Skikda">Skikda</option>
+                  <option value="Sidi Bel Abbès">Sidi Bel Abbès</option>
+                  <option value="Annaba">Annaba</option>
+                  <option value="Guelma">Guelma</option>
+                  <option value="Constantine">Constantine</option>
+                  <option value="Médéa">Médéa</option>
+                  <option value="Mostaganem">Mostaganem</option>
+                  <option value="M'Sila">M'Sila</option>
+                  <option value="Mascara">Mascara</option>
+                  <option value="Ouargla">Ouargla</option>
+                  <option value="Oran">Oran</option>
+                  <option value="El Bayadh">El Bayadh</option>
+                  <option value="Illizi">Illizi</option>
+                  <option value="Bordj Bou Arréridj">Bordj Bou Arréridj</option>
+                  <option value="Boumerdès">Boumerdès</option>
+                  <option value="El Tarf">El Tarf</option>
+                  <option value="Tindouf">Tindouf</option>
+                  <option value="Tissemsilt">Tissemsilt</option>
+                  <option value="El Oued">El Oued</option>
+                  <option value="Khenchela">Khenchela</option>
+                  <option value="Souk Ahras">Souk Ahras</option>
+                  <option value="Tipaza">Tipaza</option>
+                  <option value="Mila">Mila</option>
+                  <option value="Aïn Defla">Aïn Defla</option>
+                  <option value="Naâma">Naâma</option>
+                  <option value="Aïn Témouchent">Aïn Témouchent</option>
+                  <option value="Ghardaïa">Ghardaïa</option>
+                  <option value="Relizane">Relizane</option>
+                  <option value="Timimoun">Timimoun</option>
+                  <option value="Bordj Badji Mokhtar">Bordj Badji Mokhtar</option>
+                  <option value="Ouled Djellal">Ouled Djellal</option>
+                  <option value="Béni Abbès">Béni Abbès</option>
+                  <option value="In Salah">In Salah</option>
+                  <option value="In Guezzam">In Guezzam</option>
+                  <option value="Touggourt">Touggourt</option>
+                  <option value="Djanet">Djanet</option>
+                  <option value="El M'Ghair">El M'Ghair</option>
+                  <option value="El Meniaa">El Meniaa</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold mb-2">Delivery Type</label>
+                <select id="customerDeliveryType">
+                  <option value="">Select delivery type</option>
+                  <option value="home">Home Delivery</option>
+                  <option value="office">Office Delivery</option>
+                  <option value="pickup">Pickup Point</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        `,
+        courier: `
+          <div>
+            <p class="text-xs uppercase tracking-[0.2em] text-dp-gray mb-3">Courier Information</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-sm font-semibold mb-2">Vehicle Matricule</label>
+                <input id="courierVehicleMatricule" type="text" placeholder="123456-111-22">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold mb-2">Delivery Company</label>
+                <input id="courierDeliveryCompany" type="text" placeholder="Fast Delivery">
+              </div>
+            </div>
+          </div>
+        `,
+        admin: `
+          <div>
+            <p class="text-xs uppercase tracking-[0.2em] text-dp-gray mb-3">Admin Information</p>
+            <div class="grid grid-cols-1 gap-5">
+              <div>
+                <label class="block text-sm font-semibold mb-2">Admin Code</label>
+                <input id="adminCode" type="password" placeholder="Enter admin code">
+              </div>
+            </div>
+          </div>
+        `
+      };
+
+      if (!role || !templates[role]) {
+        roleFields.innerHTML = '';
+        roleFields.classList.add('hidden');
+        return;
+      }
+
+      roleFields.innerHTML = templates[role];
+      roleFields.classList.remove('hidden');
+    }
+
+    function passwordScore(password) {
+      let score = 0;
+      if (password.length >= 8) score++;
+      if (/[A-Z]/.test(password)) score++;
+      if (/[0-9]/.test(password)) score++;
+      if (/[^A-Za-z0-9]/.test(password)) score++;
+      return score;
+    }
+
+    function updatePasswordStrength() {
+      const password = $('#password').val();
+      const score = passwordScore(password);
+
+      const bars = ['#bar1', '#bar2', '#bar3', '#bar4'];
+      bars.forEach(bar => $(bar).removeClass('bg-red-400 bg-amber-400 bg-yellow-400 bg-dp-green').addClass('bg-slate-200'));
+
+      let label = 'Weak';
+      let activeClass = 'bg-red-400';
+
+      if (score === 2) {
+        label = 'Fair';
+        activeClass = 'bg-amber-400';
+      } else if (score === 3) {
+        label = 'Good';
+        activeClass = 'bg-yellow-400';
+      } else if (score === 4) {
+        label = 'Strong';
+        activeClass = 'bg-dp-green';
+      }
+
+      for (let i = 0; i < score; i++) {
+        $(bars[i]).removeClass('bg-slate-200').addClass(activeClass);
+      }
+
+      $('#strengthLabel').text(label);
+      $('#ruleLength').toggleClass('text-dp-green', password.length >= 8);
+      $('#ruleUpper').toggleClass('text-dp-green', /[A-Z]/.test(password));
+      $('#ruleNumber').toggleClass('text-dp-green', /[0-9]/.test(password));
+      $('#ruleSpecial').toggleClass('text-dp-green', /[^A-Za-z0-9]/.test(password));
+    }
+
+    function showMessage(text, isSuccess) {
+      $('#formMessage')
+        .removeClass('hidden bg-green-50 text-green-700 bg-red-50 text-red-700')
+        .addClass(isSuccess ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700')
+        .text(text);
+    }
+
+    function validateRoleFields(role) {
+      if (role === 'merchant') {
+        return $('#merchantStoreName').val().trim() && $('#merchantCommercialRegister').val().trim();
+      }
+
+      if (role === 'customer') {
+        return $('#customerWilaya').val() && $('#customerDeliveryType').val();
+      }
+
+      if (role === 'courier') {
+        return $('#courierVehicleMatricule').val().trim() && $('#courierDeliveryCompany').val().trim();
+      }
+
+      if (role === 'admin') {
+        return $('#adminCode').val().trim();
+      }
+
+      return false;
+    }
+
+    function buildRegisterPayload() {
+      const role = $('#role').val();
+
+      const payload = {
+        full_name: `${$('#firstName').val().trim()} ${$('#familyName').val().trim()}`.trim(),
+        phone: $('#phone').val().trim(),
+        email: $('#email').val().trim(),
+        role: role,
+        password: $('#password').val()
+      };
+
+      if (role === 'merchant') {
+        payload.store_name = $('#merchantStoreName').val().trim();
+        payload.commercial_register = $('#merchantCommercialRegister').val().trim();
+      }
+
+      if (role === 'customer') {
+        payload.wilaya = $('#customerWilaya').val();
+        payload.delivery_type = $('#customerDeliveryType').val();
+      }
+
+      if (role === 'courier') {
+        payload.vehicle_matricule = $('#courierVehicleMatricule').val().trim();
+        payload.delivery_company = $('#courierDeliveryCompany').val().trim();
+      }
+
+      if (role === 'admin') {
+        payload.admin_code = $('#adminCode').val().trim();
+      }
+
+      return payload;
+    }
+
+    $(document).ready(function () {
+      gsap.set('.hero-reveal', { y: 80, opacity: 0 });
+
+      gsap.to('#loader-bar', {
+        width: '100%',
+        duration: 1.2,
+        ease: 'power2.inOut',
+        onComplete: function () {
+          gsap.to('#loader', {
+            yPercent: -100,
+            duration: 0.8,
+            ease: 'power4.inOut'
+          });
+
+          gsap.to('.hero-reveal', {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            stagger: 0.15,
+            ease: 'power3.out',
+            delay: 0.1
+          });
+        }
+      });
+
+      $('#password').on('input', updatePasswordStrength);
+
+      $('#togglePassword').on('click', function () {
+        const input = $('#password');
+        const icon = $(this).find('i');
+        const isPassword = input.attr('type') === 'password';
+        input.attr('type', isPassword ? 'text' : 'password');
+        icon.attr('class', isPassword ? 'ph ph-eye-slash' : 'ph ph-eye');
+      });
+
+      $('#toggleConfirmPassword').on('click', function () {
+        const input = $('#confirmPassword');
+        const icon = $(this).find('i');
+        const isPassword = input.attr('type') === 'password';
+        input.attr('type', isPassword ? 'text' : 'password');
+        icon.attr('class', isPassword ? 'ph ph-eye-slash' : 'ph ph-eye');
+      });
+
+      $('#roleToggle').on('click', function () {
+        $('#roleMenu').toggleClass('show');
+      });
+
+      $(document).on('click', function (e) {
+        if (!$(e.target).closest('.role-dropdown').length) {
+          $('#roleMenu').removeClass('show');
+        }
+      });
+
+      $(document).on('click', '.role-option', function () {
+        const role = $(this).data('role');
+        const roleLabel = $(this).text().trim();
+
+        $('#role').val(role);
+        $('#selectedRoleText').text(roleLabel);
+        $('#roleMenu').removeClass('show');
+        renderRoleFields(role);
+      });
+
+      $('#systemAccessForm').on('reset', function () {
+        setTimeout(() => {
+          $('#role').val('');
+          $('#selectedRoleText').text('Select a role');
+          $('#roleFields').html('').addClass('hidden');
+          $('#strengthLabel').text('Weak');
+          $('.strength-bar')
+            .removeClass('bg-red-400 bg-amber-400 bg-yellow-400 bg-dp-green')
+            .addClass('bg-slate-200');
+          $('#formMessage').addClass('hidden').text('');
+        }, 0);
+      });
+
+      $('#systemAccessForm').on('submit', async function (e) {
+        e.preventDefault();
+
+        const role = $('#role').val();
+        const password = $('#password').val();
+        const confirmPassword = $('#confirmPassword').val();
+        const submitButton = $('#submitBtn');
+
+        if (
+          !$('#firstName').val().trim() ||
+          !$('#familyName').val().trim() ||
+          !$('#email').val().trim() ||
+          !$('#phone').val().trim()
+        ) {
+          showMessage('Please fill all the main fields.', false);
+          return;
+        }
+
+        if (!role) {
+          showMessage('Please choose a role first.', false);
+          return;
+        }
+
+        if (!validateRoleFields(role)) {
+          showMessage('Please fill all the role-specific fields.', false);
+          return;
+        }
+
+        if (passwordScore(password) < 4) {
+          showMessage('Please create a stronger password.', false);
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          showMessage('Passwords do not match.', false);
+          return;
+        }
+
+        submitButton.prop('disabled', true).text('Creating...');
+
+        try {
+          const payload = buildRegisterPayload();
+          const result = await registerUser(payload);
+
+          showMessage(result.message || 'Account created successfully. Redirecting to login...', true);
+
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1200);
+        } catch (error) {
+          showMessage(error.message || 'Registration failed.', false);
+        } finally {
+          submitButton.prop('disabled', false).text('Create Account');
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

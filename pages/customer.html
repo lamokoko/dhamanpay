@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DhamanPay | Customer Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="../js/api.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'dp-dark': '#0b1f3a',
+            'dp-blue': '#1d4ed8',
+            'dp-blue-soft': '#dbeafe',
+            'dp-white': '#f8fbff',
+            'dp-gold': '#D4AF37',
+            'dp-gold-light': '#F7E7A1',
+            'dp-gold-soft': '#F8F0C8',
+            'dp-gold-deep': '#A87412',
+            'dp-gold-dark': '#6E4B0D',
+            'dp-gray': '#64748b'
+          },
+          fontFamily: {
+            sans: ['Manrope', 'sans-serif'],
+            display: ['Oswald', 'sans-serif']
+          },
+          boxShadow: {
+            glow: '0 20px 60px rgba(29, 78, 216, 0.15)',
+            glowStrong: '0 25px 80px rgba(29, 78, 216, 0.22)',
+            goldGlow: '0 18px 45px rgba(212, 175, 55, 0.28)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Manrope', sans-serif;
+      background: #f8fbff;
+      color: #0b1f3a;
+      overflow: hidden;
+    }
+    .floating-orb {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(65px);
+      opacity: 0.28;
+      pointer-events: none;
+    }
+    .gold-metallic-text {
+      background: linear-gradient(90deg, #6E4B0D 0%, #B8860B 10%, #F7E7A1 22%, #C99700 34%, #5A3D0A 44%, #E7D37A 58%, #FFF4B5 70%, #B27A10 84%, #D4AF37 100%);
+      background-size: 220% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      animation: goldShift 6s linear infinite;
+    }
+    .gold-button {
+      background: linear-gradient(90deg, #6E4B0D 0%, #B8860B 12%, #F7E7A1 25%, #C99700 40%, #8B6508 54%, #F3E28E 68%, #B27A10 84%, #D4AF37 100%);
+      background-size: 220% auto;
+      color: #0b1f3a;
+      box-shadow: 0 14px 34px rgba(212,175,55,0.28);
+      transition: all 0.35s ease;
+    }
+    .gold-button:hover {
+      background-position: 100% center;
+      transform: translateY(-2px);
+      box-shadow: 0 18px 42px rgba(212,175,55,0.35);
+    }
+    .gold-soft-bg {
+      background: linear-gradient(90deg, rgba(110,75,13,0.10) 0%, rgba(212,175,55,0.20) 30%, rgba(247,231,161,0.28) 50%, rgba(168,116,18,0.18) 100%);
+    }
+    .gold-border { border-color: rgba(212,175,55,0.22); }
+    .loader {
+      position: fixed;
+      inset: 0;
+      background: #0b1f3a;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .loader-bar-bg {
+      width: 220px;
+      height: 2px;
+      background: rgba(255,255,255,0.12);
+      margin-top: 18px;
+      overflow: hidden;
+      position: relative;
+    }
+    .loader-bar {
+      width: 0%;
+      height: 100%;
+      background: #D4AF37;
+      position: absolute;
+      inset: 0 auto 0 0;
+    }
+    .custom-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #eff6ff; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #1d4ed8; border-radius: 999px; }
+    .panel-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .panel-card:hover { transform: translateY(-2px); box-shadow: 0 18px 40px rgba(29,78,216,0.08); }
+    .card-type-btn { transition: all 0.25s ease; }
+    .card-type-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(29,78,216,0.08); }
+    .card-type-btn.active-card-type {
+      border-color: #1d4ed8;
+      background: #eff6ff;
+      box-shadow: 0 12px 30px rgba(29,78,216,0.10);
+    }
+    .view-nav-btn.active-nav { background: white; color: #0b1f3a; }
+    #views-track { width: 700vw; }
+    .view-panel { width: 100vw; height: 100%; flex-shrink: 0; }
+    .action-btn { transition: all .2s ease; }
+    .action-btn:hover { transform: translateY(-1px); }
+    @keyframes goldShift { to { background-position: 220% center; } }
+  </style>
+</head>
+<body>
+  <div class="loader" id="loader">
+    <div class="text-white font-display text-3xl tracking-[0.25em] uppercase">DhamanPay</div>
+    <div class="loader-bar-bg"><div class="loader-bar" id="loader-bar"></div></div>
+  </div>
+
+  <div class="min-h-screen bg-dp-dark text-white relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-dp-dark via-dp-blue/70 to-dp-dark"></div>
+    <div class="floating-orb w-72 h-72 top-10 left-10" style="background:#D4AF37;"></div>
+    <div class="floating-orb w-96 h-96 bottom-0 right-0" style="background:#1d4ed8;"></div>
+
+    <header class="fixed w-full top-0 z-50 py-5 px-6 md:px-10 text-white">
+      <div class="max-w-7xl mx-auto flex justify-between items-center gap-6 flex-wrap">
+        <a href="#" class="text-2xl font-display font-bold tracking-[0.12em]">
+          <span class="text-white">DHAMAN</span><span class="gold-metallic-text">PAY</span>
+        </a>
+        <div class="flex items-center gap-3 flex-wrap justify-end">
+          <nav id="topViewNav" class="hidden md:flex items-center gap-3 flex-wrap justify-end"></nav>
+          <button id="logoutBtn" class="px-4 py-2 rounded-2xl border border-white/10 bg-white/5 text-white/80 uppercase text-[11px] tracking-[0.18em] font-bold hover:bg-white/10 transition-all">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="relative z-10 pt-24 h-screen overflow-hidden">
+      <div id="views-track" class="flex h-full transition-transform duration-500 ease-in-out">
+        <section id="home-view" class="view-panel overflow-y-auto custom-scroll">
+          <div class="min-h-full flex items-center px-6 md:px-10 py-10">
+            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-[1.1fr_0.95fr] gap-10 items-center">
+              <div>
+                <p class="hero-reveal uppercase tracking-[0.35em] text-dp-gold-light text-xs md:text-sm mb-5">Customer Dashboard</p>
+                <h1 class="hero-reveal font-display uppercase leading-none tracking-[0.06em] text-[3.2rem] md:text-[5.8rem] lg:text-[6.6rem] mb-6">
+                  <span class="text-white">Control</span><br>
+                  <span class="gold-metallic-text">Center</span>
+                </h1>
+                <p class="hero-reveal text-white/85 max-w-2xl leading-relaxed text-base md:text-lg">
+                  Access wallet, order actions, tracking, history, disputes, and profile in separate dedicated views.
+                </p>
+                <div class="hero-reveal grid sm:grid-cols-2 xl:grid-cols-3 gap-4 mt-10">
+                  <button class="home-nav-btn rounded-[1.75rem] border border-white/10 bg-white/10 backdrop-blur-md p-5 text-left hover:bg-white/15 transition-all" data-view="wallet-view"><i class="ph ph-wallet text-3xl text-dp-gold-light"></i><h3 class="mt-4 text-xl font-bold">Wallet</h3><p class="text-sm text-white/65 mt-2">Review available, frozen, and refunded amounts.</p></button>
+                  <button class="home-nav-btn rounded-[1.75rem] border border-white/10 bg-white/10 backdrop-blur-md p-5 text-left hover:bg-white/15 transition-all" data-view="confirm-view"><i class="ph ph-check-circle text-3xl text-dp-gold-light"></i><h3 class="mt-4 text-xl font-bold">Order Actions</h3><p class="text-sm text-white/65 mt-2">Confirm or cancel orders when they are still in CREATED status.</p></button>
+                  <button class="home-nav-btn rounded-[1.75rem] border border-white/10 bg-white/10 backdrop-blur-md p-5 text-left hover:bg-white/15 transition-all" data-view="tracking-view"><i class="ph ph-map-trifold text-3xl text-dp-gold-light"></i><h3 class="mt-4 text-xl font-bold">Tracking</h3><p class="text-sm text-white/65 mt-2">Follow the selected order through every timeline step.</p></button>
+                  <button class="home-nav-btn rounded-[1.75rem] border border-white/10 bg-white/10 backdrop-blur-md p-5 text-left hover:bg-white/15 transition-all" data-view="history-view"><i class="ph ph-clock-counter-clockwise text-3xl text-dp-gold-light"></i><h3 class="mt-4 text-xl font-bold">Orders History</h3><p class="text-sm text-white/65 mt-2">Search orders, inspect details, and use available actions by status.</p></button>
+                  <button class="home-nav-btn rounded-[1.75rem] border border-white/10 bg-white/10 backdrop-blur-md p-5 text-left hover:bg-white/15 transition-all" data-view="dispute-view"><i class="ph ph-warning-circle text-3xl text-dp-gold-light"></i><h3 class="mt-4 text-xl font-bold">Dispute</h3><p class="text-sm text-white/65 mt-2">Open a dispute only for DELIVERED_PENDING orders.</p></button>
+                  <button class="home-nav-btn rounded-[1.75rem] border border-white/10 bg-white/10 backdrop-blur-md p-5 text-left hover:bg-white/15 transition-all" data-view="profile-view"><i class="ph ph-user-circle text-3xl text-dp-gold-light"></i><h3 class="mt-4 text-xl font-bold">Profile</h3><p class="text-sm text-white/65 mt-2">See customer identity, account summary, and totals.</p></button>
+                </div>
+              </div>
+              <div class="hero-reveal rounded-[2rem] border border-white/10 bg-white/10 backdrop-blur-md p-6 md:p-8 shadow-glow">
+                <div class="flex items-center justify-between mb-6">
+                  <div> 
+                    <p class="text-white/65 text-xs uppercase tracking-[0.25em] mb-2">Customer</p>
+                <h3 id="heroCustomerName" class="text-white text-2xl font-display tracking-wide">Customer</h3>
+<p class="text-white/65 text-sm mt-2">Welcome to your dashboard</p>
+                  </div>
+                  <div class="w-14 h-14 rounded-2xl gold-soft-bg flex items-center justify-center text-dp-gold text-3xl border gold-border"><i class="ph-fill ph-user-circle"></i></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="rounded-2xl bg-white/10 p-5 border border-white/10"><p class="text-white/65 text-xs uppercase tracking-[0.2em]">Available Balance</p><p id="heroWallet" class="text-white text-3xl font-bold mt-3">0 DZD</p></div>
+                  <div class="rounded-2xl bg-white/10 p-5 border border-white/10"><p class="text-white/65 text-xs uppercase tracking-[0.2em]">Frozen</p><p id="heroReserved" class="text-white text-3xl font-bold mt-3">0 DZD</p></div>
+                  <div class="rounded-2xl bg-white/10 p-5 border border-white/10"><p class="text-white/65 text-xs uppercase tracking-[0.2em]">Refunded</p><p id="heroRefunded" class="text-white text-3xl font-bold mt-3">0 DZD</p></div>
+                  <div class="rounded-2xl bg-white/10 p-5 border border-white/10"><p class="text-white/65 text-xs uppercase tracking-[0.2em]">Completed Orders</p><p id="heroPaidOrders" class="text-white text-3xl font-bold mt-3">0</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="wallet-view" class="view-panel overflow-y-auto custom-scroll bg-dp-white text-dp-dark">
+          <div class="max-w-7xl mx-auto px-6 md:px-10 py-28">
+            <div class="mb-8"><p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Wallet Slide</p><h2 class="text-4xl font-display uppercase">Wallet Management</h2></div>
+            <div class="grid grid-cols-1 xl:grid-cols-[1.02fr_0.98fr] gap-8 items-start">
+              <div class="space-y-6">
+                <div class="rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow panel-card">
+                  <div class="flex items-center justify-between gap-4 flex-wrap mb-6"><div><p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Wallet</p><h2 class="text-2xl font-display uppercase text-dp-dark">Add Money</h2></div><span class="px-4 py-2 rounded-full gold-soft-bg text-dp-gold-dark text-xs font-bold uppercase tracking-[0.2em]">Card Top-Up</span></div>
+                  <div class="space-y-5">
+                    <div>
+                      <label class="block text-sm font-semibold text-dp-dark mb-3">Select Card Type</label>
+                      <div class="grid sm:grid-cols-2 gap-4">
+                        <button type="button" class="card-type-btn active-card-type rounded-[1.5rem] border border-dp-blue bg-blue-50 p-5 text-left" data-card="DAHABIYA"><div class="flex items-center justify-between mb-3"><span class="text-lg font-bold text-dp-dark">Dahabiya</span><i class="ph ph-credit-card text-2xl text-dp-blue"></i></div><p class="text-sm text-dp-gray">Use Edahabia card details for wallet top-up.</p></button>
+                        <button type="button" class="card-type-btn rounded-[1.5rem] border border-blue-100 bg-white p-5 text-left" data-card="CIB"><div class="flex items-center justify-between mb-3"><span class="text-lg font-bold text-dp-dark">CIB</span><i class="ph ph-bank text-2xl text-dp-blue"></i></div><p class="text-sm text-dp-gray">Use your interbank card information to add wallet funds.</p></button>
+                      </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                      <div><label class="block text-sm font-semibold text-dp-dark mb-2">Card Holder Name</label><input id="cardHolderName" type="text" placeholder="Ahmed Client" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark"></div>
+                      <div><label class="block text-sm font-semibold text-dp-dark mb-2">Card Number</label><input id="cardNumber" type="text" placeholder="1234 5678 9012 3456" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark"></div>
+                      <div><label class="block text-sm font-semibold text-dp-dark mb-2">Expiry Date</label><input id="cardExpiry" type="text" placeholder="MM/YY" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark"></div>
+                      <div><label class="block text-sm font-semibold text-dp-dark mb-2">CVV</label><input id="cardCvv" type="password" placeholder="***" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark"></div>
+                      <div class="md:col-span-2"><label class="block text-sm font-semibold text-dp-dark mb-2">Amount to Add</label><input id="topUpAmount" type="number" min="1" placeholder="5000" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark"></div>
+                    </div>
+                    <button id="topUpBtn" class="gold-button px-6 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold">Confirm Card Top-Up</button>
+                  </div>
+                  <div id="walletMessage" class="hidden mt-4 rounded-2xl p-4 text-sm"></div>
+                </div>
+                <div class="rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow panel-card">
+                  <div class="flex items-center justify-between gap-4 flex-wrap mb-6"><div><p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Wallet Checking</p><h2 class="text-2xl font-display uppercase text-dp-dark">Amounts Summary</h2></div><i class="ph ph-wallet text-3xl text-dp-blue"></i></div>
+                  <div class="grid md:grid-cols-3 gap-4">
+                    <div class="rounded-[1.5rem] bg-slate-50 border border-blue-100 p-5"><p class="text-dp-gray text-xs uppercase tracking-[0.2em]">Available Amount</p><p id="availableAmountText" class="text-3xl font-bold text-dp-dark mt-3">0 DZD</p></div>
+                    <div class="rounded-[1.5rem] bg-slate-50 border border-blue-100 p-5"><p class="text-dp-gray text-xs uppercase tracking-[0.2em]">Frozen Amount</p><p id="payableAmountText" class="text-3xl font-bold text-dp-blue mt-3">0 DZD</p></div>
+                    <div class="rounded-[1.5rem] bg-slate-50 border gold-border p-5 shadow-goldGlow"><p class="text-dp-gray text-xs uppercase tracking-[0.2em]">Refunded Amount</p><p id="refundedAmountText" class="text-3xl font-bold text-dp-gold-deep mt-3">0 DZD</p></div>
+                  </div>
+                </div>
+                <div class="rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow panel-card">
+                  <div class="flex items-center justify-between gap-4 flex-wrap mb-6"><div><p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Wallet History</p><h2 class="text-2xl font-display uppercase text-dp-dark">Recent Transactions</h2></div><i class="ph ph-receipt text-3xl text-dp-blue"></i></div>
+                  <div id="walletHistory" class="space-y-3"><div class="rounded-[1.5rem] border border-dashed border-blue-200 p-6 text-dp-gray text-sm">Transactions will appear here.</div></div>
+                </div>
+              </div>
+              <div class="rounded-[2rem] bg-dp-dark text-white p-6 md:p-7 shadow-glowStrong border border-white/10">
+                <div class="flex justify-between items-start gap-4 mb-6"><div><p class="text-white/60 uppercase tracking-[0.25em] text-xs mb-2">Payment Method</p><h3 class="text-3xl font-display">Selected Card</h3></div><span id="cardTypeBadge" class="px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-white/10 text-white">DAHABIYA</span></div>
+                <div class="space-y-4">
+                  <div class="rounded-[1.5rem] bg-white/5 border border-white/10 p-5">
+                    <p class="text-white/70 uppercase tracking-[0.2em] text-xs mb-4">Top-Up Flow</p>
+                    <div class="space-y-4 text-sm">
+                      <div class="flex gap-3 items-start"><div class="w-8 h-8 rounded-full gold-button text-xs font-bold flex items-center justify-center">1</div><div><p class="font-semibold">Choose card type</p><p class="text-white/55 mt-1">Select Dahabiya or CIB before entering payment details.</p></div></div>
+                      <div class="flex gap-3 items-start"><div class="w-8 h-8 rounded-full gold-button text-xs font-bold flex items-center justify-center">2</div><div><p class="font-semibold">Enter card information</p><p class="text-white/55 mt-1">Fill card holder, card number, expiry date, and CVV securely.</p></div></div>
+                      <div class="flex gap-3 items-start"><div class="w-8 h-8 rounded-full gold-button text-xs font-bold flex items-center justify-center">3</div><div><p class="font-semibold">Submit request</p><p class="text-white/55 mt-1">This page is ready for backend-driven wallet flow.</p></div></div>
+                    </div>
+                  </div>
+                  <div class="rounded-[1.5rem] gold-soft-bg border gold-border p-4 text-sm text-white/90"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="confirm-view" class="view-panel overflow-y-auto custom-scroll bg-dp-white text-dp-dark">
+          <div class="max-w-5xl mx-auto px-6 md:px-10 py-28">
+            <div class="mb-8"><p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Order Actions Slide</p><h2 class="text-4xl font-display uppercase">Confirm or Cancel</h2></div>
+            <div class="rounded-[2rem] bg-dp-dark text-white p-6 md:p-7 shadow-glowStrong border border-white/10">
+              <div class="flex justify-between items-start gap-4 mb-6"><div><p class="text-white/60 uppercase tracking-[0.25em] text-xs mb-2">Customer Action</p><h3 class="text-3xl font-display">Order Action Panel</h3></div><span id="confirmStatusBadge" class="px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-white/10 text-white">Waiting</span></div>
+              <div class="space-y-4">
+                <div><label class="block text-sm text-white/75 mb-2">Order Code</label><input id="confirmOrderCode" type="text" placeholder="" class="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-white/20"></div>
+                <button id="findOrderBtn" class="w-full bg-white text-dp-dark px-6 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold hover:bg-slate-100 transition-colors">Load Order</button>
+                <div class="rounded-[1.5rem] bg-white/5 border border-white/10 p-5">
+                  <p class="text-white/70 uppercase tracking-[0.2em] text-xs mb-4">Order Preview</p>
+                  <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div><p class="text-white/50 mb-1">Order Code</p><p id="previewOrderCode" class="font-bold text-white">—</p></div>
+                    <div><p class="text-white/50 mb-1">Merchant</p><p id="previewMerchant" class="font-bold text-white">—</p></div>
+                    <div><p class="text-white/50 mb-1">Courier</p><p id="previewCourier" class="font-bold text-white">—</p></div>
+                    <div><p class="text-white/50 mb-1">Amount</p><p id="previewAmount" class="font-bold text-dp-gold-light">—</p></div>
+                    <div class="col-span-2"><p class="text-white/50 mb-1">Status</p><p id="previewStatus" class="font-bold text-white">Waiting for lookup</p></div>
+                  </div>
+                </div>
+                <div class="rounded-[1.5rem] gold-soft-bg border gold-border p-4 text-sm text-white/90">Customer can confirm or cancel only when the order status is CREATED.</div>
+                <div class="grid md:grid-cols-3 gap-3">
+                  <button id="confirmPaymentBtn" class="gold-button px-6 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold">Confirm</button>
+                  <button id="cancelOrderBtn" class="bg-white/5 border border-white/10 text-white px-6 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold hover:bg-white/10 transition-colors">Cancel</button>
+                  <button id="trackSelectedOrderBtn" class="bg-white/5 border border-white/10 text-white px-6 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold hover:bg-white/10 transition-colors">Track</button>
+                </div>
+                <div id="confirmMessage" class="hidden rounded-2xl p-4 text-sm"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tracking-view" class="view-panel overflow-y-auto custom-scroll bg-dp-white text-dp-dark">
+          <div class="max-w-5xl mx-auto px-6 md:px-10 py-28">
+            <div class="mb-8"><p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Tracking Slide</p><h2 class="text-4xl font-display uppercase">Track Order</h2></div>
+            <div class="rounded-[2rem] bg-dp-dark text-white p-6 md:p-7 shadow-glowStrong border border-white/10">
+              <div class="flex justify-between items-start gap-4 mb-6"><div><p class="text-white/60 uppercase tracking-[0.25em] text-xs mb-2">Tracking Overview</p><h3 id="trackingViewCode" class="text-3xl font-display">No Order Selected</h3></div><span id="trackingViewBadge" class="px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-white/10 text-white">Empty</span></div>
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="rounded-[1.5rem] bg-white/5 border border-white/10 p-5">
+                  <p class="text-white/70 uppercase tracking-[0.2em] text-xs mb-4">Tracking Info</p>
+                  <div class="space-y-4 text-sm">
+                    <div><p class="text-white/50 mb-1">Current Status</p><p id="trackingViewStatus" class="font-bold text-white">—</p></div>
+                    <div><p class="text-white/50 mb-1">Merchant</p><p id="trackingViewMerchant" class="font-bold text-white">—</p></div>
+                    <div><p class="text-white/50 mb-1">Courier</p><p id="trackingViewCourier" class="font-bold text-white">—</p></div>
+                    <div><p class="text-white/50 mb-1">Tracking Message</p><p id="trackingViewMessage" class="font-bold text-dp-gold-light">—</p></div>
+                  </div>
+                </div>
+                <div class="rounded-[1.5rem] bg-white/5 border border-white/10 p-5"><p class="text-white/70 uppercase tracking-[0.2em] text-xs mb-4">Timeline</p><div id="trackingTimeline" class="space-y-4"><p class="text-white/55 text-sm">No tracking steps yet.</p></div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="history-view" class="view-panel overflow-y-auto custom-scroll bg-dp-white text-dp-dark">
+          <div class="max-w-7xl mx-auto px-6 md:px-10 py-28">
+            <div class="mb-8"><p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Orders History Slide</p><h2 class="text-4xl font-display uppercase">Orders History</h2></div>
+            <div class="rounded-[2rem] bg-white border border-blue-100 p-5 md:p-6 shadow-glow mb-8">
+              <div class="flex flex-col lg:flex-row gap-4 lg:items-center">
+                <div class="flex-1 relative"><i class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-dp-gray text-lg"></i><input id="searchOrdersInput" type="text" placeholder="Search by order code, merchant or courier" class="w-full pl-12 pr-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark"></div>
+                <select id="statusOrdersFilter" class="px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 text-dp-dark min-w-[180px]"><option value="all">All statuses</option><option value="CREATED">Created</option><option value="ESCROW_FROZEN">Escrow Frozen</option><option value="SHIPPED">Shipped</option><option value="DELIVERED_PENDING">Delivered Pending</option><option value="DISPUTE_OPEN">Dispute Open</option><option value="COMPLETED">Completed</option><option value="REFUNDED">Refunded</option><option value="CANCELLED">Cancelled</option></select>
+                <button id="resetOrdersBtn" class="bg-dp-blue text-white px-5 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold hover:bg-blue-700 transition-colors">Reset</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 xl:grid-cols-[1.18fr_0.82fr] gap-8 items-start">
+              <div><div id="ordersList" class="space-y-4"></div><div id="ordersEmptyState" class="hidden rounded-[2rem] bg-white border border-dashed border-blue-200 p-10 text-center text-dp-gray shadow-glow">No orders found for this customer yet.</div></div>
+              <div class="rounded-[2rem] bg-dp-dark text-white p-6 md:p-7 shadow-glowStrong border border-white/10">
+                <div class="flex justify-between items-start gap-4 mb-6"><div><p class="text-white/60 uppercase tracking-[0.25em] text-xs mb-2">Order Details</p><h3 id="detailCode" class="text-3xl font-display">No Order Selected</h3></div><span id="detailStatusBadge" class="px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-white/10 text-white">Empty</span></div>
+                <div class="space-y-4">
+                  <div class="rounded-[1.5rem] bg-white/5 border border-white/10 p-5"><p class="text-white/70 uppercase tracking-[0.2em] text-xs mb-4">Order Info</p><div class="grid grid-cols-2 gap-4 text-sm"><div><p class="text-white/50 mb-1">Amount</p><p id="detailAmount" class="font-bold text-white">—</p></div><div><p class="text-white/50 mb-1">Merchant</p><p id="detailMerchant" class="font-bold text-white">—</p></div><div><p class="text-white/50 mb-1">Courier</p><p id="detailCourier" class="font-bold text-white">—</p></div><div><p class="text-white/50 mb-1">Tracking</p><p id="detailTracking" class="font-bold text-white">—</p></div><div><p class="text-white/50 mb-1">Payment</p><p id="detailPayment" class="font-bold text-dp-gold-light">—</p></div><div><p class="text-white/50 mb-1">Date</p><p id="detailDate" class="font-bold text-white">—</p></div></div></div>
+                  <div class="rounded-[1.5rem] bg-white/5 border border-white/10 p-5"><p class="text-white/70 uppercase tracking-[0.2em] text-xs mb-4">Progress Timeline</p><div id="detailTimeline" class="space-y-4"><p class="text-white/55 text-sm">No timeline yet.</p></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="dispute-view" class="view-panel overflow-y-auto custom-scroll bg-dp-white text-dp-dark">
+          <div class="max-w-7xl mx-auto px-6 md:px-10 py-28">
+            <div class="mb-8"><p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Dispute Slide</p><h2 class="text-4xl font-display uppercase">Disputes</h2></div>
+            <div class="grid grid-cols-1 xl:grid-cols-[1fr_0.95fr] gap-8">
+              <div class="rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow panel-card">
+                <div class="flex items-center justify-between gap-4 flex-wrap mb-6"><div><p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Support</p><h2 class="text-2xl font-display uppercase text-dp-dark">Open a Dispute</h2></div><i class="ph ph-warning-circle text-3xl text-dp-blue"></i></div>
+                <div class="space-y-4">
+                  <div class="grid md:grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-semibold text-dp-dark mb-2">Merchant Code</label><input id="disputeMerchantCode" type="text" placeholder="" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark"></div>
+                    <div><label class="block text-sm font-semibold text-dp-dark mb-2">Order Code</label><input id="disputeOrderCode" type="text" placeholder="" class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark"></div>
+                  </div>
+                  <div><label class="block text-sm font-semibold text-dp-dark mb-2">Explain the Dispute</label><textarea id="disputeExplanation" rows="6" placeholder="Describe the problem with the order, merchant, or delivery..." class="w-full px-4 py-4 rounded-2xl bg-blue-50 border border-blue-100 focus:outline-none focus:ring-2 focus:ring-dp-blue/20 focus:border-dp-blue text-dp-dark"></textarea></div>
+                  <button id="submitDisputeBtn" class="gold-button px-6 py-4 rounded-2xl uppercase text-xs tracking-[0.2em] font-bold">Submit Dispute</button>
+                  <div id="disputeMessage" class="hidden rounded-2xl p-4 text-sm"></div>
+                </div>
+              </div>
+              <div class="rounded-[2rem] bg-white border border-blue-100 p-6 shadow-glow panel-card">
+                <div class="flex items-center justify-between gap-4 flex-wrap mb-6"><div><p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Cases</p><h2 class="text-2xl font-display uppercase text-dp-dark">Submitted Disputes</h2></div><i class="ph ph-files text-3xl text-dp-blue"></i></div>
+                <div id="disputesList" class="space-y-3"><div class="rounded-[1.5rem] border border-dashed border-blue-200 p-6 text-dp-gray text-sm">No disputes submitted yet.</div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="profile-view" class="view-panel overflow-y-auto custom-scroll bg-dp-white text-dp-dark">
+          <div class="max-w-6xl mx-auto px-6 md:px-10 py-28">
+            <div class="mb-8"><p class="text-dp-gray text-xs uppercase tracking-[0.24em] mb-2">Profile Slide</p><h2 class="text-4xl font-display uppercase">Customer Profile</h2></div>
+            <div class="grid lg:grid-cols-[0.9fr_1.1fr] gap-8">
+              <div class="rounded-[2rem] bg-dp-dark text-white p-8 shadow-glowStrong border border-white/10">
+                <div class="w-20 h-20 rounded-3xl gold-soft-bg flex items-center justify-center text-dp-gold text-5xl border gold-border mb-6"><i class="ph-fill ph-user-circle"></i></div>
+                <h3 id="customerName" class="text-3xl font-display">—</h3>
+<p id="customerRole" class="text-white/60 mt-2">—</p>
+
+<div class="mt-8 space-y-4 text-sm">
+  <div>
+    <span class="text-white/50">Email:</span>
+    <span id="customerEmail" class="font-semibold">—</span>
+  </div>
+
+  <div>
+    <span class="text-white/50">Phone:</span>
+    <span id="customerPhone" class="font-semibold">—</span>
+  </div>
+
+  <div>
+    <span class="text-white/50">Customer ID:</span>
+    <span id="customerId" class="font-semibold">—</span>
+  </div>
+
+  <div>
+    <span class="text-white/50">Wilaya:</span>
+    <span id="customerWilaya" class="font-semibold">—</span>
+  </div>
+
+  <div>
+    <span class="text-white/50">Delivery Type:</span>
+    <span id="customerDeliveryType" class="font-semibold">—</span>
+  </div>
+</div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+  let orders = [];
+  let wallet = { available: 0, frozen: 0, refunded: 0 };
+  let disputes = [];
+  let selectedOrder = null;
+  let selectedCardType = 'DAHABIYA';
+
+  const viewOrder = [
+    'home-view',
+    'wallet-view',
+    'confirm-view',
+    'tracking-view',
+    'history-view',
+    'dispute-view',
+    'profile-view'
+  ];
+
+  function logout() {
+    localStorage.removeItem('token');
+    window.location.href = 'login.html';
+  }
+
+  function formatDZD(value) {
+    const amount = Number(value ?? 0);
+    if (!Number.isFinite(amount)) return '0 DZD';
+    return amount.toLocaleString() + ' DZD';
+  }
+
+  function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value ?? '—';
+  }
+
+  function showMessage(id, text, success) {
+    $('#' + id)
+      .removeClass('hidden bg-green-50 text-green-700 bg-red-50 text-red-700 bg-blue-50 text-blue-700')
+      .addClass(
+        success === true
+          ? 'bg-green-50 text-green-700'
+          : success === false
+          ? 'bg-red-50 text-red-700'
+          : 'bg-blue-50 text-blue-700'
+      )
+      .text(text);
+  }
+
+  function orderBadgeClass(status) {
+    return {
+      CREATED: 'bg-slate-100 text-slate-700',
+      ESCROW_FROZEN: 'bg-blue-100 text-blue-700',
+      SHIPPED: 'bg-indigo-100 text-indigo-700',
+      DELIVERED_PENDING: 'bg-amber-100 text-amber-700',
+      DISPUTE_OPEN: 'bg-orange-100 text-orange-700',
+      COMPLETED: 'bg-green-100 text-green-700',
+      REFUNDED: 'bg-red-100 text-red-700',
+      CANCELLED: 'bg-zinc-100 text-zinc-700'
+    }[status] || 'bg-slate-100 text-slate-700';
+  }
+
+  function paymentBadgeClass(payment) {
+    return {
+      'Awaiting confirmation': 'bg-slate-50 border border-slate-200 text-slate-700',
+      'Frozen in escrow': 'bg-blue-50 border border-blue-200 text-blue-700',
+      'Released to merchant': 'bg-green-50 border border-green-200 text-green-700',
+      'Refunded': 'bg-red-50 border border-red-200 text-red-700'
+    }[payment] || 'bg-slate-50 border border-slate-200 text-slate-700';
+  }
+
+  async function loadMeData() {
+    try {
+      const res = await getMe();
+      window.currentUser = res.data || {};
+
+      setText('heroCustomerName', window.currentUser.full_name || 'Customer');
+      setText('customerName', window.currentUser.full_name || '—');
+      setText('customerRole', window.currentUser.role ? window.currentUser.role.toUpperCase() : '—');
+      setText('customerEmail', window.currentUser.email || '—');
+      setText('customerPhone', window.currentUser.phone || '—');
+      setText('customerId', window.currentUser.id || '—');
+      setText('customerWilaya', window.currentUser.wilaya || '—');
+      setText('customerDeliveryType', window.currentUser.delivery_type || '—');
+    } catch (err) {
+      console.error('Failed to load customer /me:', err);
+      showMessage('confirmMessage', err.message || 'Failed to load profile.', false);
+    }
+  }
+
+  async function loadOrdersData() {
+  try {
+    console.log('Loading orders...');
+
+    const res = await getOrders();
+    console.log('GET /orders response:', res);
+
+    let rawOrders = [];
+
+    if (Array.isArray(res)) {
+      rawOrders = res;
+    } else if (Array.isArray(res.data)) {
+      rawOrders = res.data;
+    } else if (Array.isArray(res.orders)) {
+      rawOrders = res.orders;
+    } else if (res.data && Array.isArray(res.data.data)) {
+      rawOrders = res.data.data;
+    }
+
+    console.log('Parsed rawOrders:', rawOrders);
+
+   orders = rawOrders.map(order => ({
+  id: order.id || order.order_id,
+  code: order.order_code || order.code || `ORD-${String(order.id || order.order_id).padStart(3, '0')}`,
+  amount: Number(order.amount || 0),
+  status: order.status || 'CREATED',
+
+  merchant: order.merchant?.full_name || order.merchant_name || `Merchant #${order.merchant_id ?? ''}`,
+  merchantCode: order.merchant_id ? String(order.merchant_id) : '',
+
+  courier: order.courier?.full_name || order.courier_name || 'Not assigned',
+  courierId: order.courier_id ? String(order.courier_id) : '',
+
+  tracking:
+    order.status === 'CREATED' ? 'Waiting for confirmation' :
+    order.status === 'ESCROW_FROZEN' ? 'Funds frozen in escrow' :
+    order.status === 'SHIPPED' ? 'Courier picked up the order' :
+    order.status === 'DELIVERED_PENDING' ? 'Waiting final resolution' :
+    order.status === 'DISPUTE_OPEN' ? 'Dispute under review' :
+    order.status === 'COMPLETED' ? 'Completed successfully' :
+    order.status === 'REFUNDED' ? 'Refund issued' :
+    order.status === 'CANCELLED' ? 'Order cancelled' :
+    '—',
+
+  payment:
+    order.status === 'CREATED' ? 'Awaiting confirmation' :
+    order.status === 'ESCROW_FROZEN' ? 'Frozen in escrow' :
+    order.status === 'COMPLETED' ? 'Released to merchant' :
+    order.status === 'REFUNDED' ? 'Refunded' :
+    'In progress',
+
+  dateLabel: order.created_at || order.updated_at
+    ? new Date(order.created_at || order.updated_at).toLocaleString()
+    : '—',
+
+  dateRank: order.created_at || order.updated_at
+    ? new Date(order.created_at || order.updated_at).getTime()
+    : 0,
+
+  timeline: [order.status || 'CREATED']
+}));
+
+    console.log('Mapped orders:', orders);
+
+    if (!orders.length) {
+      showMessage('confirmMessage', 'No orders returned from backend for this customer.', false);
+    }
+  } catch (err) {
+    console.error('Failed to load orders:', err);
+    showMessage('confirmMessage', err.message || 'Failed to load orders.', false);
+  }
+}
+  async function confirmOrderUI(id) {
+    try {
+      await confirmOrder(id);
+      showMessage('confirmMessage', 'Order confirmed successfully.', true);
+      await loadOrdersData();
+      updateWalletUI();
+      renderOrders();
+      resetPreview();
+      clearOrderDetails();
+      updateTrackingView(null);
+    } catch (err) {
+      console.error('Confirm failed:', err);
+      showMessage('confirmMessage', err.message || 'Failed to confirm order.', false);
+    }
+  }
+
+  async function cancelOrderUI(id) {
+    try {
+      await cancelOrder(id);
+      showMessage('confirmMessage', 'Order cancelled successfully.', true);
+      await loadOrdersData();
+      updateWalletUI();
+      renderOrders();
+      resetPreview();
+      clearOrderDetails();
+      updateTrackingView(null);
+    } catch (err) {
+      console.error('Cancel failed:', err);
+      showMessage('confirmMessage', err.message || 'Failed to cancel order.', false);
+    }
+  }
+
+  async function renderWalletHistory() {
+    const container = $('#walletHistory');
+    container.html('<div class="rounded-[1.5rem] border border-dashed border-blue-200 p-6 text-dp-gray text-sm">Transactions will appear here.</div>');
+  }
+
+  function updateWalletUI() {
+    $('#heroWallet, #availableAmountText').text(formatDZD(wallet.available));
+    $('#heroReserved, #payableAmountText').text(formatDZD(wallet.frozen));
+    $('#heroRefunded, #refundedAmountText').text(formatDZD(wallet.refunded));
+
+    const completedCount = orders.filter(o => o.status === 'COMPLETED').length;
+    $('#heroPaidOrders').text(completedCount);
+
+    renderWalletHistory();
+  }
+
+  function clearOrderDetails() {
+    $('#detailCode').text('No Order Selected');
+    $('#detailAmount').text('—');
+    $('#detailMerchant').text('—');
+    $('#detailCourier').text('—');
+    $('#detailTracking').text('—');
+    $('#detailPayment').text('—');
+    $('#detailDate').text('—');
+    $('#detailStatusBadge')
+      .attr('class', 'px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-white/10 text-white')
+      .text('Empty');
+    $('#detailTimeline').html('<p class="text-white/55 text-sm">No timeline yet.</p>');
+    selectedOrder = null;
+  }
+
+  function updateOrderDetails(order) {
+    if (!order) return;
+
+    $('#detailCode').text(order.code ?? '—');
+    $('#detailAmount').text(formatDZD(order.amount));
+    $('#detailMerchant').text((order.merchant ?? '—') + (order.merchantCode ? ` (${order.merchantCode})` : ''));
+    $('#detailCourier').text((order.courier ?? '—') + (order.courierId ? ` (${order.courierId})` : ''));
+    $('#detailTracking').text(order.tracking ?? '—');
+    $('#detailPayment').text(order.payment ?? '—');
+    $('#detailDate').text(order.dateLabel ?? '—');
+    $('#detailStatusBadge')
+      .attr('class', 'px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] ' + orderBadgeClass(order.status))
+      .text((order.status || 'EMPTY').replaceAll('_', ' '));
+
+    const timeline = $('#detailTimeline');
+    timeline.empty();
+
+    const steps = Array.isArray(order.timeline) ? order.timeline : [];
+    if (!steps.length) {
+      timeline.html('<p class="text-white/55 text-sm">No timeline yet.</p>');
+    } else {
+      steps.forEach((step, index) => {
+        timeline.append(`
+          <div class="flex gap-3 items-start">
+            <div class="w-7 h-7 rounded-full text-dp-dark text-xs font-bold flex items-center justify-center mt-0.5 gold-button">${index + 1}</div>
+            <div>
+              <p class="text-white font-semibold text-sm">${step}</p>
+              <p class="text-white/55 text-xs mt-1">Customer activity timeline</p>
+            </div>
+          </div>
+        `);
+      });
+    }
+
+    selectedOrder = order;
+  }
+
+  function updateTrackingView(order) {
+    if (!order) {
+      $('#trackingViewCode').text('No Order Selected');
+      $('#trackingViewBadge')
+        .text('Empty')
+        .attr('class', 'px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-white/10 text-white');
+      $('#trackingViewStatus, #trackingViewMerchant, #trackingViewCourier, #trackingViewMessage').text('—');
+      $('#trackingTimeline').html('<p class="text-white/55 text-sm">No tracking steps yet.</p>');
+      return;
+    }
+
+    $('#trackingViewCode').text(order.code ?? '—');
+    $('#trackingViewBadge')
+      .text((order.status || 'EMPTY').replaceAll('_', ' '))
+      .attr('class', 'px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] ' + orderBadgeClass(order.status));
+    $('#trackingViewStatus').text((order.status || '—').replaceAll('_', ' '));
+    $('#trackingViewMerchant').text((order.merchant ?? '—') + (order.merchantCode ? ` (${order.merchantCode})` : ''));
+    $('#trackingViewCourier').text((order.courier ?? '—') + (order.courierId ? ` (${order.courierId})` : ''));
+    $('#trackingViewMessage').text(order.tracking ?? '—');
+
+    const timeline = $('#trackingTimeline');
+    timeline.empty();
+
+    const steps = Array.isArray(order.timeline) ? order.timeline : [];
+    if (!steps.length) {
+      timeline.html('<p class="text-white/55 text-sm">No tracking steps yet.</p>');
+    } else {
+      steps.forEach((step, index) => {
+        timeline.append(`
+          <div class="flex gap-3 items-start">
+            <div class="w-8 h-8 rounded-full gold-button text-xs font-bold flex items-center justify-center">${index + 1}</div>
+            <div>
+              <p class="text-white font-semibold text-sm">${step}</p>
+              <p class="text-white/55 text-xs mt-1">Tracking progression</p>
+            </div>
+          </div>
+        `);
+      });
+    }
+  }
+
+  function getCustomerActionButtons(order) {
+    let buttons = '';
+
+    if (order.status === 'CREATED') {
+      buttons += `<button class="confirm-btn action-btn bg-dp-blue text-white px-5 py-3 rounded-2xl uppercase text-[11px] tracking-[0.2em] font-bold hover:bg-blue-700 transition-colors">Confirm</button>`;
+      buttons += `<button class="cancel-btn action-btn bg-white border border-blue-100 text-dp-dark px-5 py-3 rounded-2xl uppercase text-[11px] tracking-[0.2em] font-bold hover:bg-blue-50 transition-colors">Cancel</button>`;
+    }
+
+    if (order.status === 'DELIVERED_PENDING') {
+      buttons += `<button class="dispute-btn action-btn bg-orange-100 text-orange-700 px-5 py-3 rounded-2xl uppercase text-[11px] tracking-[0.2em] font-bold hover:bg-orange-200 transition-colors">Dispute</button>`;
+    }
+
+    return buttons;
+  }
+
+  function renderOrders() {
+    const search = ($('#searchOrdersInput').val() || '').trim().toLowerCase();
+    const status = $('#statusOrdersFilter').val() || 'all';
+    const container = $('#ordersList');
+    container.empty();
+
+    const filtered = orders
+      .filter(order => {
+        const matchesSearch =
+          !search ||
+          (order.code || '').toLowerCase().includes(search) ||
+          (order.merchant || '').toLowerCase().includes(search) ||
+          (order.merchantCode || '').toLowerCase().includes(search) ||
+          (order.courierId || '').toLowerCase().includes(search);
+
+        const matchesStatus = status === 'all' || order.status === status;
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => (b.dateRank || 0) - (a.dateRank || 0));
+
+    if (filtered.length === 0) $('#ordersEmptyState').removeClass('hidden');
+    else $('#ordersEmptyState').addClass('hidden');
+
+    filtered.forEach(order => {
+      const card = $(`
+        <div class="panel-card rounded-[1.5rem] border border-blue-100 bg-white p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-glow">
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+              <span class="text-lg font-bold text-dp-dark">${order.code ?? '—'}</span>
+              <span class="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-[0.18em] ${orderBadgeClass(order.status)}">${(order.status || 'EMPTY').replaceAll('_', ' ')}</span>
+              <span class="px-3 py-1 rounded-full text-[11px] font-bold ${paymentBadgeClass(order.payment)}">${order.payment || '—'}</span>
+            </div>
+            <div class="flex flex-wrap gap-x-5 gap-y-2 text-sm text-dp-gray">
+              <span>Merchant: ${order.merchant ?? '—'}</span>
+              <span>Courier: ${order.courierId ?? '—'}</span>
+              <span>Amount: ${formatDZD(order.amount)}</span>
+              <span>Tracking: ${order.tracking ?? '—'}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 flex-wrap">
+            <button class="details-btn action-btn bg-dp-blue text-white px-5 py-3 rounded-2xl uppercase text-[11px] tracking-[0.2em] font-bold hover:bg-blue-700 transition-colors">Show Details</button>
+            <button class="track-btn action-btn bg-white border border-blue-100 text-dp-dark px-5 py-3 rounded-2xl uppercase text-[11px] tracking-[0.2em] font-bold hover:bg-blue-50 transition-colors">Track</button>
+            ${getCustomerActionButtons(order)}
+          </div>
+        </div>
+      `);
+
+      card.find('.details-btn').on('click', function () {
+        updateOrderDetails(order);
+        updateTrackingView(order);
+        goToView('history-view');
+      });
+
+      card.find('.track-btn').on('click', function () {
+        updateOrderDetails(order);
+        updateTrackingView(order);
+        goToView('tracking-view');
+      });
+
+      card.find('.confirm-btn').on('click', function () {
+        confirmOrderUI(order.id);
+      });
+
+      card.find('.cancel-btn').on('click', function () {
+        cancelOrderUI(order.id);
+      });
+
+      card.find('.dispute-btn').on('click', function () {
+        openDisputeUI(order.id);
+      });
+
+      container.append(card);
+    });
+
+    if (filtered.length > 0 && !selectedOrder) updateOrderDetails(filtered[0]);
+    if (filtered.length === 0) clearOrderDetails();
+  }
+
+  function resetPreview() {
+    $('#previewOrderCode').text('—');
+    $('#previewMerchant').text('—');
+    $('#previewCourier').text('—');
+    $('#previewAmount').text('—');
+    $('#previewStatus').text('Waiting for order selection');
+    $('#confirmStatusBadge')
+      .text('Waiting')
+      .attr('class', 'px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-white/10 text-white');
+  }
+
+ function findOrderForConfirmation() {
+  const input = $('#confirmOrderCode').val().trim().toUpperCase();
+
+  const found = orders.find(order => {
+    const code = String(order.code || '').toUpperCase();
+    const idText = String(order.id || '').toUpperCase();
+    return code === input || idText === input;
+  });
+
+  if (!found) {
+    resetPreview();
+    showMessage('confirmMessage', 'No matching order found for this code.', false);
+    return null;
+  }
+
+  $('#previewOrderCode').text(found.code ?? '—');
+  $('#previewMerchant').text((found.merchant ?? '—') + (found.merchantCode ? ` (${found.merchantCode})` : ''));
+  $('#previewCourier').text((found.courier ?? '—') + (found.courierId ? ` (${found.courierId})` : ''));
+  $('#previewAmount').text(formatDZD(found.amount));
+  $('#previewStatus').text((found.status || '—').replaceAll('_', ' '));
+  $('#confirmStatusBadge')
+    .text('Order Found')
+    .attr('class', 'px-3 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-green-100 text-green-700');
+
+  showMessage('confirmMessage', 'Order found successfully. Review details before action.', true);
+  selectedOrder = found;
+  return found;
+}
+  function openDisputeUI(id) {
+    const order = orders.find(o => o.id === id);
+    if (!order) return;
+
+    $('#disputeMerchantCode').val(order.merchantCode || '');
+    $('#disputeOrderCode').val(order.code || '');
+    goToView('dispute-view');
+  }
+
+  function confirmPayment() {
+    const order = findOrderForConfirmation();
+    if (!order) return;
+
+    if (order.status === 'CREATED') {
+      confirmOrderUI(order.id);
+      return;
+    }
+
+    if (order.status === 'CANCELLED') {
+      showMessage('confirmMessage', 'Cancelled orders cannot be confirmed.', false);
+      return;
+    }
+
+    showMessage('confirmMessage', 'This order cannot be confirmed in its current status.', false);
+  }
+
+  function cancelFromPanel() {
+    const order = findOrderForConfirmation();
+    if (!order) return;
+
+    if (order.status !== 'CREATED') {
+      showMessage('confirmMessage', 'Only CREATED orders can be cancelled.', false);
+      return;
+    }
+
+    cancelOrderUI(order.id);
+  }
+
+  async function submitDispute() {
+    const orderCode = $('#disputeOrderCode').val().trim();
+    const explanation = $('#disputeExplanation').val().trim();
+
+    if (!orderCode || !explanation) {
+      showMessage('disputeMessage', 'Fill all fields.', false);
+      return;
+    }
+
+    showMessage('disputeMessage', 'Dispute submission still needs backend wiring.', false);
+  }
+
+  function renderDisputes() {
+    const container = $('#disputesList');
+    container.empty();
+
+    if (!Array.isArray(disputes) || disputes.length === 0) {
+      container.html('<div class="rounded-[1.5rem] border border-dashed border-blue-200 p-6 text-dp-gray text-sm">No disputes submitted yet.</div>');
+      return;
+    }
+
+    disputes.forEach(dispute => {
+      container.append(`
+        <div class="rounded-[1.5rem] border border-blue-100 bg-slate-50/70 p-5">
+          <div class="flex items-center justify-between gap-4 flex-wrap mb-3">
+            <span class="text-lg font-bold text-dp-dark">${dispute.id ?? '—'}</span>
+            <span class="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-[0.18em] bg-orange-100 text-orange-700">${dispute.status ?? 'Open'}</span>
+          </div>
+          <p class="text-sm text-dp-gray mb-2">Order: ${dispute.orderCode ?? '—'} • Merchant: ${dispute.merchantCode ?? '—'}</p>
+          <p class="text-sm text-dp-dark">${dispute.explanation ?? '—'}</p>
+        </div>
+      `);
+    });
+  }
+
+  function buildTopNav() {
+    const items = [
+      ['home-view', 'Home'],
+      ['wallet-view', 'Wallet'],
+      ['confirm-view', 'Confirm'],
+      ['tracking-view', 'Tracking'],
+      ['history-view', 'History'],
+      ['dispute-view', 'Dispute'],
+      ['profile-view', 'Profile']
+    ];
+
+    $('#topViewNav').html(
+      items.map(([id, label]) =>
+        `<button class="view-nav-btn px-4 py-2 rounded-2xl border border-white/10 bg-white/5 text-white/80 uppercase text-[11px] tracking-[0.18em] font-bold hover:bg-white/10 transition-all" data-view="${id}">${label}</button>`
+      ).join('')
+    );
+  }
+
+  function setActiveNav(viewId) {
+    $('.view-nav-btn').removeClass('active-nav');
+    $(`.view-nav-btn[data-view="${viewId}"]`).addClass('active-nav');
+  }
+
+  function goToView(viewId) {
+    const index = viewOrder.indexOf(viewId);
+    if (index === -1) return;
+
+    $('#views-track').css('transform', `translateX(-${index * 100}vw)`);
+    setActiveNav(viewId);
+  }
+
+  $(document).ready(function () {
+    buildTopNav();
+    $('#logoutBtn').on('click', logout);
+
+    gsap.to('#loader-bar', {
+      width: '100%',
+      duration: 1.2,
+      ease: 'power2.inOut',
+      onComplete: function () {
+        gsap.to('#loader', { yPercent: -100, duration: 0.8, ease: 'power4.inOut' });
+        gsap.to('.hero-reveal', { y: 0, opacity: 1, duration: 1, stagger: 0.12, ease: 'power3.out', delay: 0.15 });
+      }
+    });
+
+    gsap.set('.hero-reveal', { y: 60, opacity: 0 });
+
+    $('#topViewNav').on('click', '.view-nav-btn', function () {
+      goToView($(this).data('view'));
+    });
+
+    $('.home-nav-btn').on('click', function () {
+      goToView($(this).data('view'));
+    });
+
+    $('.card-type-btn').on('click', function () {
+      $('.card-type-btn').removeClass('active-card-type');
+      $(this).addClass('active-card-type');
+      selectedCardType = $(this).data('card');
+      $('#cardTypeBadge').text(selectedCardType);
+    });
+
+    $('#topUpBtn').on('click', function () {
+      const holder = $('#cardHolderName').val().trim();
+      const number = $('#cardNumber').val().trim();
+      const expiry = $('#cardExpiry').val().trim();
+      const cvv = $('#cardCvv').val().trim();
+      const amount = Number($('#topUpAmount').val());
+
+      if (!holder || !number || !expiry || !cvv) {
+        showMessage('walletMessage', 'Fill all card information first.', false);
+        return;
+      }
+
+      if (!amount || amount <= 0) {
+        showMessage('walletMessage', 'Enter a valid amount.', false);
+        return;
+      }
+
+      showMessage('walletMessage', 'Wallet top-up will be handled by backend later.', false);
+    });
+
+    $('#findOrderBtn').on('click', findOrderForConfirmation);
+    $('#confirmPaymentBtn').on('click', confirmPayment);
+    $('#cancelOrderBtn').on('click', cancelFromPanel);
+
+    $('#trackSelectedOrderBtn').on('click', function () {
+      if (!selectedOrder) {
+        showMessage('confirmMessage', 'Select an order first.', false);
+        return;
+      }
+      updateTrackingView(selectedOrder);
+      goToView('tracking-view');
+    });
+
+    $('#searchOrdersInput').on('input', renderOrders);
+    $('#statusOrdersFilter').on('change', renderOrders);
+
+    $('#resetOrdersBtn').on('click', function () {
+      $('#searchOrdersInput').val('');
+      $('#statusOrdersFilter').val('all');
+      renderOrders();
+    });
+
+    $('#submitDisputeBtn').on('click', submitDispute);
+
+    (async function () {
+      if (!getToken()) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      await loadMeData();
+      await loadOrdersData();
+      console.log('Orders after loadOrdersData:', orders);
+
+      updateWalletUI();
+      renderOrders();
+      renderDisputes();
+      resetPreview();
+      clearOrderDetails();
+      updateTrackingView(null);
+      goToView('home-view');
+    })();
+  });
+  </script>
+  <script src="../js/customer.js"></script>
+</body>
+</html>
