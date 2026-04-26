@@ -1,209 +1,1008 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>DhamanPay | Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DhamanPay | Secure Escrow Payments</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            'dp-dark': '#0b1f3a',
-            'dp-blue': '#1d4ed8',
-            'dp-blue-deep': '#173b8f',
-            'dp-panel': '#f2efe6',
-            'dp-gold': '#D4AF37',
-            'dp-gold-light': '#F7E7A1',
-            'dp-gold-dark': '#6E4B0D'
-          },
-          fontFamily: {
-            sans: ['Manrope', 'sans-serif'],
-            display: ['Oswald', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
 
   <style>
-    body {
-      background: #0b1f3a;
-      color: white;
-      overflow-x: hidden;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold-1: #f9d56c;
+      --gold-2: #f4b83f;
+      --gold-3: #b97810;
+      --purple-bg: #070022;
+      --purple-mid: #160044;
+      --purple-deep: #09002b;
+      --white-dim: rgba(255,255,255,0.72);
     }
 
-    .gold-metallic-text {
-      background: linear-gradient(90deg,#6E4B0D,#F7E7A1,#D4AF37);
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: "Manrope", sans-serif;
+      background: var(--purple-bg);
+      color: #fff;
+      overflow: hidden;
+    }
+
+    .slides {
+      width: 100%;
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    .slides::-webkit-scrollbar { display: none; }
+
+    .slide {
+      width: 100%;
+      height: 100vh;
+      scroll-snap-align: start;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
+      opacity: 0.028;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #slide1 {
+      background:
+        radial-gradient(ellipse 70% 60% at 18% 56%, rgba(118,42,190,0.60) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 50% at 76% 44%, rgba(119,47,211,0.48) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 35% at 92% 85%, rgba(244,184,63,0.08) 0%, transparent 55%),
+        linear-gradient(135deg, #070022 0%, #160044 50%, #09002b 100%);
+    }
+
+    #slide2 {
+      background:
+        radial-gradient(ellipse 60% 55% at 90% 20%, rgba(100,30,180,0.5) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 45% at 12% 80%, rgba(118,42,190,0.42) 0%, transparent 55%),
+        linear-gradient(145deg, #09002b 0%, #130038 50%, #070022 100%);
+    }
+
+    #slide3 {
+      background:
+        radial-gradient(ellipse 65% 55% at 10% 30%, rgba(118,42,190,0.55) 0%, transparent 60%),
+        radial-gradient(ellipse 45% 40% at 85% 70%, rgba(100,30,180,0.4) 0%, transparent 55%),
+        linear-gradient(155deg, #0a0028 0%, #160044 50%, #070022 100%);
+    }
+
+    #slide4 {
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 60%, rgba(118,42,190,0.5) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 35% at 20% 20%, rgba(244,184,63,0.07) 0%, transparent 50%),
+        linear-gradient(180deg, #09002b 0%, #160044 60%, #070022 100%);
+    }
+
+    #slide5 {
+      background:
+        radial-gradient(ellipse 65% 55% at 88% 22%, rgba(118,42,190,0.48) 0%, transparent 58%),
+        radial-gradient(ellipse 45% 40% at 14% 78%, rgba(244,184,63,0.08) 0%, transparent 50%),
+        linear-gradient(145deg, #070022 0%, #170045 52%, #09002b 100%);
+    }
+
+    .dot-grid {
+      position: absolute;
+      width: 420px;
+      height: 500px;
+      background-image: radial-gradient(rgba(159,92,255,0.32) 1.2px, transparent 1.2px);
+      background-size: 20px 20px;
+      opacity: 0.38;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .gold-text {
+      background: linear-gradient(100deg, #b97810, #f9d56c 45%, #f4b83f);
       -webkit-background-clip: text;
       background-clip: text;
-      color: transparent;
       -webkit-text-fill-color: transparent;
     }
 
-    .gold-button {
-      background: linear-gradient(90deg,#6E4B0D,#F7E7A1,#D4AF37);
-      color: #0b1f3a;
-      transition: 0.3s;
+    .gold-btn {
+      background: linear-gradient(100deg, #f9d56c 0%, #f4b83f 50%, #db9718 100%);
+      color: #070022;
+      font-weight: 900;
+      box-shadow: 0 16px 48px rgba(244,184,63,0.28), 0 2px 8px rgba(244,184,63,0.2);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
     }
 
-    .gold-button:hover {
+    .gold-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 24px 72px rgba(244,184,63,0.40), 0 4px 16px rgba(244,184,63,0.3);
+    }
+
+    .ghost-btn {
+      border: 1.5px solid rgba(173,110,255,0.40);
+      background: rgba(255,255,255,0.04);
+      color: #fff;
+      font-weight: 900;
+      backdrop-filter: blur(8px);
+      transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
+    }
+
+    .ghost-btn:hover {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(173,110,255,0.65);
       transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(212,175,55,0.4);
     }
 
-    .logo-box {
-      border-radius: 2rem;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      padding: 40px;
-      text-align: center;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+    .glass {
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(177,116,255,0.22);
+      backdrop-filter: blur(20px);
+      border-radius: 28px;
     }
 
-    .hero-bg {
-      background: linear-gradient(
-        135deg,
-        #0b1f3a 0%,
-        #1e1b4b 40%,
-        #0b1f3a 100%
-      );
+    .hero-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 30;
+      padding: 26px 54px;
+      background: linear-gradient(180deg, rgba(7,0,34,0.7) 0%, transparent 100%);
     }
 
-    .loader {
-      position: fixed;
-      inset: 0;
-      background: #0b1f3a;
-      z-index: 9999;
+    .hero-header-inner {
+      max-width: 1760px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+    }
+
+    .logo {
+      width: 148px;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 2px 12px rgba(244,184,63,0.18));
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 38px;
+      font-size: 15px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.80);
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: inherit;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+
+    .nav a:hover { color: var(--gold-2); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-weight: 800;
+    }
+
+    .header-actions a {
+      text-decoration: none;
+      transition: color 0.2s;
+      color: rgba(255,255,255,0.84);
+    }
+
+    .header-actions a:first-child:hover { color: var(--gold-2); }
+
+    .small-pill {
+      padding: 13px 26px;
+      border-radius: 14px;
+      font-size: 15px;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+      max-width: 1760px;
+      margin: 0 auto;
+      padding: 118px 54px 54px;
+      display: grid;
+      grid-template-columns: 1fr 1.05fr;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .hero-left { padding-top: 32px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 22px;
+      border-radius: 999px;
+      border: 1px solid rgba(244,184,63,0.36);
+      color: var(--gold-2);
+      background: rgba(244,184,63,0.07);
+      font-weight: 800;
+      font-size: 14.5px;
+      margin-bottom: 38px;
+      box-shadow: 0 0 36px rgba(244,184,63,0.09);
+      letter-spacing: 0.01em;
+    }
+
+    .badge i { font-size: 18px; }
+
+    .hero-title {
+      font-size: clamp(52px, 4.8vw, 90px);
+      line-height: 1.05;
+      letter-spacing: -0.06em;
+      font-weight: 900;
+    }
+
+    .hero-copy {
+      margin-top: 26px;
+      max-width: 680px;
+      font-size: clamp(17px, 1.35vw, 23px);
+      line-height: 1.60;
+      color: var(--white-dim);
+    }
+
+    .hero-buttons {
+      margin-top: 38px;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-buttons a {
+      text-decoration: none;
+      min-width: 210px;
+      height: 64px;
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 44px;
+      margin-top: 54px;
+      padding-top: 38px;
+      border-top: 1px solid rgba(177,116,255,0.15);
+    }
+
+    .stat-item { display: flex; flex-direction: column; gap: 4px; }
+
+    .stat-num {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      background: linear-gradient(100deg, #f9d56c, #f4b83f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.50);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .hero-right {
+      position: relative;
+      height: 680px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .hero-right::before {
+      content: "";
+      position: absolute;
+      width: 700px;
+      height: 700px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(126,50,220,0.30), transparent 68%);
+      filter: blur(20px);
+      pointer-events: none;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .visual-wrap {
+      position: relative;
+      z-index: 2;
+      width: min(830px, 100%);
+      height: 620px;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.55), 0 0 0 1px rgba(177,116,255,0.15);
+    }
+
+    .visual-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transform: scale(1.03);
+    }
+
+    .visual-fade-left {
+      position: absolute;
+      z-index: 3;
+      left: 0; top: 0; bottom: 0;
+      width: 140px;
+      background: linear-gradient(90deg, rgba(22,0,68,0.85) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .visual-fade-bottom {
+      position: absolute;
+      z-index: 3;
+      left: 0; right: 0; bottom: 0;
+      height: 100px;
+      background: linear-gradient(0deg, rgba(12,0,40,0.80) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .trust-badge {
+      position: absolute;
+      z-index: 5;
+      left: -28px;
+      bottom: 64px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 22px;
+      border-radius: 18px;
+      background: rgba(12,3,40,0.88);
+      border: 1px solid rgba(244,184,63,0.30);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.45);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .trust-badge i { color: var(--gold-2); font-size: 22px; }
+
+    .slide-btn {
+      position: absolute;
+      right: 38px;
+      bottom: 38px;
+      z-index: 40;
+      width: 60px;
+      height: 60px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.07);
+      color: white;
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      cursor: pointer;
+      transition: background 0.22s, color 0.22s, transform 0.22s;
+    }
+
+    .slide-btn:hover {
+      background: var(--gold-2);
+      color: #070022;
+      transform: translateY(-3px);
+    }
+
+    .top-btn { bottom: 110px; }
+
+    .center-wrap {
+      height: 100%;
+      max-width: 1450px;
+      margin: 0 auto;
+      padding: 86px 54px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      align-items: center;
-      transition: transform 0.8s ease-in-out;
-    }
-
-    .loader-bar-bg {
-      width: 220px;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.12);
-      margin-top: 18px;
-      overflow: hidden;
       position: relative;
+      z-index: 10;
     }
 
-    .loader-bar {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(90deg, #6E4B0D 0%, #F7E7A1 50%, #D4AF37 100%);
+    .section-label {
+      color: var(--gold-2);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(44px, 4.6vw, 78px);
+      line-height: 1.05;
+      letter-spacing: -0.055em;
+      font-weight: 900;
+    }
+
+    .workflow-grid {
+      margin-top: 52px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
+    }
+
+    .step-card {
+      position: relative;
+      padding: 32px 26px 28px;
+      transition: transform 0.22s ease, border-color 0.22s ease;
+    }
+
+    .step-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(244,184,63,0.3);
+    }
+
+    .step-card:not(:last-child)::after {
+      content: "";
       position: absolute;
-      left: 0;
-      top: 0;
+      right: -10px;
+      top: 50px;
+      width: 20px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(244,184,63,0.55), rgba(244,184,63,0.10));
+      z-index: 5;
+    }
+
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(244,184,63,0.12);
+      border: 1px solid rgba(244,184,63,0.35);
+      color: var(--gold-2);
+      font-size: 13px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .step-card i {
+      color: var(--gold-2);
+      font-size: 42px;
+      display: block;
+      margin-bottom: 18px;
+    }
+
+    .step-card h3 { font-size: 20px; font-weight: 900; margin-bottom: 10px; }
+    .step-card p { font-size: 13.5px; color: rgba(255,255,255,0.58); line-height: 1.65; }
+
+    .faq-grid {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .faq-card {
+      padding: 26px 26px;
+      border-radius: 24px;
+      transition: transform 0.22s ease, border-color 0.22s ease;
+    }
+
+    .faq-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(244,184,63,0.28);
+    }
+
+    .faq-card h3 {
+      font-size: 18px;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .faq-card p {
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.60);
+      line-height: 1.65;
+    }
+
+    .about-layout {
+      height: 100%;
+      max-width: 1450px;
+      margin: 0 auto;
+      padding: 86px 54px;
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 56px;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .about-copy {
+      margin-top: 26px;
+      max-width: 650px;
+      font-size: clamp(16px, 1.25vw, 20px);
+      line-height: 1.65;
+      color: rgba(255,255,255,0.68);
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .contact-card {
+      padding: 30px 28px;
+      border-radius: 24px;
+      transition: transform 0.22s, border-color 0.22s;
+    }
+
+    .contact-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(244,184,63,0.28);
+    }
+
+    .contact-card i {
+      color: var(--gold-2);
+      font-size: 34px;
+      margin-bottom: 18px;
+      display: block;
+    }
+
+    .contact-card h3 {
+      font-size: 19px;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .contact-card p, .contact-card a {
+      font-size: 14px;
+      color: rgba(255,255,255,0.62);
+      line-height: 1.65;
+      text-decoration: none;
+    }
+
+    .contact-card a:hover { color: var(--gold-2); }
+
+    .final-slide {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 32px;
+      flex-direction: column;
+    }
+
+    .final-logo {
+      width: 160px;
+      margin-bottom: 30px;
+      filter: drop-shadow(0 4px 20px rgba(244,184,63,0.22));
+    }
+
+    .final-slide h2 {
+      font-size: clamp(46px, 5.5vw, 88px);
+      line-height: 1.04;
+      letter-spacing: -0.06em;
+      font-weight: 900;
+      max-width: 900px;
+    }
+
+    .final-slide > p {
+      color: rgba(255,255,255,0.62);
+      font-size: 20px;
+      margin-top: 26px;
+      max-width: 560px;
+    }
+
+    .final-actions {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 44px;
+      flex-wrap: wrap;
+    }
+
+    .final-actions a {
+      text-decoration: none;
+      min-width: 220px;
+      height: 68px;
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .trust-row {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin-top: 52px;
+      padding-top: 38px;
+      border-top: 1px solid rgba(177,116,255,0.14);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.60);
+    }
+
+    .trust-item i { color: var(--gold-2); font-size: 18px; }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 34px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,0.38);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      animation: bounceY 2s infinite ease-in-out;
+    }
+
+    .scroll-hint i { font-size: 20px; }
+
+    @keyframes bounceY {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    @media (max-width: 1300px) {
+      .workflow-grid { grid-template-columns: repeat(3, 1fr); }
+      .faq-grid { grid-template-columns: repeat(2, 1fr); }
+      .step-card:nth-child(3)::after { display: none; }
+    }
+
+    @media (max-width: 1024px) {
+      html, body { overflow: auto; }
+      .slides { overflow-y: auto; scroll-snap-type: none; }
+      .slide { height: auto; min-height: 100vh; }
+      .hero-header { position: relative; padding: 22px 22px; }
+      .nav, .header-actions .small-pill { display: none; }
+      .hero-content { padding: 20px 22px 60px; grid-template-columns: 1fr; }
+      .hero-right { height: auto; }
+      .visual-wrap { width: 100%; height: auto; border-radius: 18px; }
+      .visual-wrap img { height: auto; object-fit: contain; transform: none; }
+      .visual-fade-left { display: none; }
+      .trust-badge { left: 8px; }
+      .workflow-grid, .faq-grid, .contact-grid, .about-layout { grid-template-columns: 1fr; }
+      .about-layout, .center-wrap { padding: 70px 22px; }
+      .slide-btn { display: none; }
+      .step-card::after { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .hero-stats { gap: 24px; flex-wrap: wrap; }
+      .final-slide h2 { letter-spacing: -0.04em; }
     }
   </style>
 </head>
 
 <body>
+  <main class="slides" id="slides">
 
-  <!-- Loader Curtain -->
-  <div class="loader" id="loader">
-    <div class="text-white font-display text-3xl tracking-[0.25em] uppercase">
-      Dhaman<span class="gold-metallic-text">Pay</span>
-    </div>
-    <div class="loader-bar-bg">
-      <div class="loader-bar" id="loader-bar"></div>
-    </div>
-  </div>
+    <section class="slide" id="slide1">
+      <div class="dot-grid" style="left:-60px; top:30%;"></div>
+      <div class="dot-grid" style="right:-40px; top:38%;"></div>
 
-  <header class="fixed top-0 left-0 w-full z-40 py-5 px-8 flex justify-between items-center">
-    <h1 class="text-2xl font-display tracking-widest">
-      Dhaman<span class="gold-metallic-text">Pay</span>
-    </h1>
+      <header class="hero-header">
+        <div class="hero-header-inner">
+          <a href="#slide1"><img class="logo" src="./logo.png" alt="DhamanPay" /></a>
 
-    <div class="flex gap-4 items-center">
-      <a href="login.html" class="text-white/80 hover:text-white transition">Login</a>
-      <a href="loginn.html" class="gold-button px-4 py-2 rounded-xl text-sm font-bold">Register</a>
-    </div>
-  </header>
+          <nav class="nav">
+            <a href="#slide2">Workflow</a>
+            <a href="#slide3">FAQ</a>
+            <a href="#slide4">Who Are We</a>
+          </nav>
 
-  <section class="min-h-screen flex items-center hero-bg pt-20">
-    <div class="w-full max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
-
-      <div class="hero-reveal flex justify-center lg:justify-start">
-        <div class="logo-box max-w-xl w-full">
-          <h1 class="text-6xl md:text-7xl font-display tracking-widest">
-            Dhaman<span class="gold-metallic-text">Pay</span>
-          </h1>
-
-          <p class="mt-6 text-white/70 text-lg leading-relaxed">
-            Secure your transactions. Protect your money.
-            Buy and sell online with more confidence.
-          </p>
+          <div class="header-actions">
+            <a href="login.html">Login</a>
+            <a href="loginn.html" class="gold-btn small-pill">Create Account <i class="ph ph-arrow-right"></i></a>
+          </div>
         </div>
-      </div>
+      </header>
 
-      <div class="hero-reveal flex justify-center lg:justify-end">
-        <div class="bg-[#f2efe6] text-[#0b1f3a] rounded-3xl p-10 max-w-md w-full shadow-2xl">
-
-          <h2 class="text-3xl font-display mb-6">
-            Start Using DhamanPay
-          </h2>
-
-          <p class="text-gray-600 mb-8 leading-relaxed">
-            Join a secure platform that protects both buyers and sellers during every transaction.
+      <div class="hero-content">
+        <div class="hero-left">
+          <div class="badge">
+            <i class="ph-fill ph-shield-check"></i>
+            Secure Escrow — Trusted by Buyers & amp ; Sellers
+          </div>
+          <h1 class="hero-title">
+Zero Risk ... <br> Full <span class="gold-text"> Dhaman</span>
+</h1>
+          <p class="hero-copy">
+            DhamanPay holds your payment in secure escrow until delivery is verified.
+            Safe for buyers. Fair for sellers. Dispute-ready for everyone.
           </p>
 
-          <div class="flex flex-col gap-4">
-            <a href="login.html"
-               class="gold-button py-4 rounded-xl text-center uppercase text-sm font-bold">
-              Login
-            </a>
-
-            <a href="loginn.html"
-               class="border border-gray-300 py-4 rounded-xl text-center uppercase text-sm font-bold hover:bg-gray-100 transition">
-              Create Account
-            </a>
+          <div class="hero-buttons">
+            <a href="loginn.html" class="gold-btn">Create Account <i class="ph ph-arrow-right"></i></a>
+            <a href="login.html" class="ghost-btn">Login <i class="ph ph-sign-in"></i></a>
           </div>
 
+          <div class="hero-stats">
+            <div class="stat-item">
+              <span class="stat-num">100%</span>
+              <span class="stat-label">Escrow Protected</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num">4</span>
+              <span class="stat-label">Role Dashboards</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num">5</span>
+              <span class="stat-label">Clear Steps</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="visual-wrap">
+            <img src="./visual.png" alt="DhamanPay dashboard visual" />
+            <div class="visual-fade-left"></div>
+            <div class="visual-fade-bottom"></div>
+          </div>
+          <div class="trust-badge">
+            <i class="ph-fill ph-seal-check"></i>
+            Funds held safely until delivery
+          </div>
         </div>
       </div>
 
-    </div>
-  </section>
+      <div class="scroll-hint">
+        <i class="ph ph-arrow-down"></i>
+        <span>Scroll</span>
+      </div>
+
+      <button class="slide-btn" onclick="goToSlide(2)" title="Next">
+        <i class="ph ph-arrow-down"></i>
+      </button>
+    </section>
+
+    <section class="slide" id="slide2">
+      <div class="dot-grid" style="right:-40px; bottom:10%;"></div>
+
+      <div class="center-wrap">
+        <p class="section-label">Workflow</p>
+        <h2 class="section-title">
+          From order creation<br>
+          to <span class="gold-text">final settlement.</span>
+        </h2>
+
+        <div class="workflow-grid">
+          <div class="glass step-card">
+            <div class="step-number">01</div>
+            <i class="ph ph-storefront"></i>
+            <h3>Merchant Creates Order</h3>
+            <p>The seller creates the order with amount, product, address, and customer details.</p>
+          </div>
+
+          <div class="glass step-card">
+            <div class="step-number">02</div>
+            <i class="ph ph-user-check"></i>
+            <h3>Customer Confirms</h3>
+            <p>The buyer checks the order and confirms only if everything is correct.</p>
+          </div>
+
+          <div class="glass step-card">
+            <div class="step-number">03</div>
+            <i class="ph ph-lock-key"></i>
+            <h3>Money Is Frozen</h3>
+            <p>The payment is held safely in escrow and does not go directly to the seller.</p>
+          </div>
+
+          <div class="glass step-card">
+            <div class="step-number">04</div>
+            <i class="ph ph-truck"></i>
+            <h3>Courier Delivers</h3>
+            <p>The courier ships the product and submits delivery proof.</p>
+          </div>
+
+          <div class="glass step-card">
+            <div class="step-number">05</div>
+            <i class="ph ph-scales"></i>
+            <h3>Release or Refund</h3>
+            <p>Admin verifies the case and releases money to the merchant or refunds the customer.</p>
+          </div>
+        </div>
+      </div>
+
+      <button class="slide-btn top-btn" onclick="goToSlide(1)" title="Back">
+        <i class="ph ph-arrow-up"></i>
+      </button>
+      <button class="slide-btn" onclick="goToSlide(3)" title="Next">
+        <i class="ph ph-arrow-down"></i>
+      </button>
+    </section>
+
+    <section class="slide" id="slide3">
+      <div class="center-wrap">
+        <p class="section-label">FAQ</p>
+        <h2 class="section-title">
+          Questions users ask<br>
+          <span class="gold-text">before using DhamanPay.</span>
+        </h2>
+
+        <div class="faq-grid">
+          <div class="glass faq-card">
+            <h3>Is my money safe?</h3>
+            <p>Your payment is locked in escrow and only released after delivery is verified.</p>
+          </div>
+
+          <div class="glass faq-card">
+            <h3>Do I need to trust the seller?</h3>
+            <p>No. DhamanPay replaces blind trust with a controlled payment and verification system.</p>
+          </div>
+
+          <div class="glass faq-card">
+            <h3>What if the item is wrong?</h3>
+            <p>The customer can open a dispute and provide details such as serial number or video proof.</p>
+          </div>
+
+          <div class="glass faq-card">
+            <h3>Who decides in a dispute?</h3>
+            <p>The admin checks the delivery proof and dispute evidence, then releases or refunds.</p>
+          </div>
+
+          <div class="glass faq-card">
+            <h3>When is money released?</h3>
+            <p>Only after the delivery proof is submitted and the order is cleared for settlement.</p>
+          </div>
+
+          <div class="glass faq-card">
+            <h3>Who uses DhamanPay?</h3>
+            <p>Customers, merchants, couriers, and admins each use their own role-based dashboard.</p>
+          </div>
+        </div>
+      </div>
+
+      <button class="slide-btn top-btn" onclick="goToSlide(2)" title="Back">
+        <i class="ph ph-arrow-up"></i>
+      </button>
+      <button class="slide-btn" onclick="goToSlide(4)" title="Next">
+        <i class="ph ph-arrow-down"></i>
+      </button>
+    </section>
+
+    <section class="slide" id="slide4">
+      <div class="dot-grid" style="left:-60px; top:20%;"></div>
+
+      <div class="about-layout">
+        <div>
+          <p class="section-label">Who are we</p>
+          <h2 class="section-title">
+            We are building trust<br>
+            for online commerce.
+          </h2>
+          <p class="about-copy">
+            DhamanPay is a secure transaction layer designed for buyers and sellers who already agree outside the platform.
+            Our role is simple: protect the money, organize the workflow, and make every step clear.
+          </p>
+          <p class="about-copy">
+            We focus on safer digital transactions in Algeria, combining escrow payment, order tracking, courier proof,
+            and admin dispute resolution in one clean experience.
+          </p>
+        </div>
+
+        <div class="contact-grid">
+          <div class="glass contact-card">
+            <i class="ph ph-envelope-simple"></i>
+            <h3>Email</h3>
+            <a href="mailto:contact@dhamanpay.com">contact@dhamanpay.com</a>
+          </div>
+
+          <div class="glass contact-card">
+            <i class="ph ph-phone"></i>
+            <h3>Phone</h3>
+            <p>+213 000 000 000</p>
+          </div>
+
+          <div class="glass contact-card">
+            <i class="ph ph-map-pin"></i>
+            <h3>Location</h3>
+            <p>Algeria</p>
+          </div>
+
+          <div class="glass contact-card">
+            <i class="ph ph-chats-circle"></i>
+            <h3>Support</h3>
+            <p>For help, account questions, and transaction support.</p>
+          </div>
+        </div>
+      </div>
+
+      <button class="slide-btn top-btn" onclick="goToSlide(3)" title="Back">
+        <i class="ph ph-arrow-up"></i>
+      </button>
+      <button class="slide-btn" onclick="goToSlide(5)" title="Next">
+        <i class="ph ph-arrow-down"></i>
+      </button>
+    </section>
+
+    <section class="slide final-slide" id="slide5">
+      <div class="dot-grid" style="left:50%;transform:translateX(-50%);top:5%;opacity:0.22;"></div>
+
+      <div style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;">
+        <img class="final-logo" src="./logo.png" alt="DhamanPay" />
+        <p class="section-label">Start now</p>
+        <h2>Ready to secure your<br>next transaction?</h2>
+        <p>Join DhamanPay and protect your online buying and selling with confidence.</p>
+
+        <div class="final-actions">
+          <a href="loginn.html" class="gold-btn">Create Account <i class="ph ph-arrow-right"></i></a>
+          <a href="login.html" class="ghost-btn">Login <i class="ph ph-sign-in"></i></a>
+        </div>
+
+        <div class="trust-row">
+          <div class="trust-item"><i class="ph-fill ph-shield-check"></i> Escrow Protected</div>
+          <div class="trust-item"><i class="ph-fill ph-clock-countdown"></i> Real-time Tracking</div>
+          <div class="trust-item"><i class="ph-fill ph-scales"></i> Dispute Resolution</div>
+          <div class="trust-item"><i class="ph-fill ph-users-three"></i> 4 Role Dashboards</div>
+        </div>
+      </div>
+
+      <button class="slide-btn top-btn" onclick="goToSlide(4)" title="Back">
+        <i class="ph ph-arrow-up"></i>
+      </button>
+    </section>
+
+  </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      gsap.set('.hero-reveal', { y: 80, opacity: 0 });
+    function goToSlide(n) {
+      document.getElementById("slide" + n).scrollIntoView({ behavior: "smooth" });
+    }
 
-      gsap.to('#loader-bar', {
-        width: '100%',
-        duration: 1.2,
-        ease: 'power2.inOut',
-        onComplete: function () {
-          gsap.to('#loader', {
-            yPercent: -100,
-            duration: 0.8,
-            ease: 'power4.inOut'
-          });
-
-          gsap.to('.hero-reveal', {
-            y: 0,
-            opacity: 1,
-            duration: 1,
-            stagger: 0.15,
-            ease: 'power3.out',
-            delay: 0.1
-          });
-        }
+    document.addEventListener("keydown", (e) => {
+      const slides = document.querySelectorAll(".slide");
+      const current = [...slides].findIndex(s => {
+        const r = s.getBoundingClientRect();
+        return r.top >= -10 && r.top < window.innerHeight / 2;
       });
+
+      if (e.key === "ArrowDown" && current < slides.length - 1) goToSlide(current + 2);
+      if (e.key === "ArrowUp" && current > 0) goToSlide(current);
     });
   </script>
-
 </body>
 </html>

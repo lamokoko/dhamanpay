@@ -5,50 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DhamanPay | Login</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;700;800&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;700;800&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-
-               'dp-dark': '#0b1f3a',
-            'dp-blue': '#1d4ed8',
-            'dp-blue-soft': '#dbeafe',
-            'dp-white': '#f8fbff',
-            'dp-gold': '#D4AF37',
-            'dp-gold-light': '#F7E7A1',
-            'dp-gold-soft': '#F8F0C8',
-            'dp-gold-deep': '#A87412',
-            'dp-gold-dark': '#6E4B0D',
-
-            'dp-green': '#16a34a',
-            'dp-green-soft': '#dcfce7',
-            'dp-gray': '#64748b'
-          },
-          fontFamily: {
-            sans: ['Manrope', 'sans-serif'],
-            display: ['Oswald', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      background: #0b1f3a;
-      color: #fff;
+      min-height: 100vh;
       overflow-x: hidden;
       font-family: 'Manrope', sans-serif;
+      color: white;
+      background:
+        radial-gradient(circle at 22% 52%, rgba(102, 51, 190, .55), transparent 35%),
+        radial-gradient(circle at 76% 40%, rgba(244, 184, 63, .12), transparent 28%),
+        linear-gradient(135deg, #070022 0%, #160044 45%, #09002b 100%);
     }
 
-    .gold-metallic-text {
-      background: linear-gradient(90deg, #6E4B0D, #F7E7A1, #D4AF37);
+    .gold-text {
+      background: linear-gradient(90deg, #B97810, #F8D36A, #F4B83F);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -56,68 +33,110 @@
     }
 
     .gold-button {
-      background: linear-gradient(90deg, #6E4B0D, #F7E7A1, #D4AF37);
-      color: #0b1f3a;
-      transition: 0.3s;
+      background: linear-gradient(90deg, #F8D36A 0%, #F4B83F 50%, #D8921A 100%);
+      color: #070022;
       border: none;
       cursor: pointer;
-      font-weight: 700;
+      font-weight: 900;
+      transition: .3s ease;
+      box-shadow: 0 18px 42px rgba(244,184,63,.28);
     }
 
     .gold-button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(212,175,55,0.4);
+      box-shadow: 0 24px 60px rgba(244,184,63,.42);
     }
 
     .gold-button:disabled {
-      opacity: 0.7;
+      opacity: .65;
       cursor: not-allowed;
       transform: none;
-      box-shadow: none;
     }
 
     .glass-card {
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,.065);
+      border: 1px solid rgba(177,116,255,.28);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 30px 90px rgba(0,0,0,.32);
     }
 
-    .logo-box {
-      border-radius: 2rem;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      padding: 40px;
-      text-align: center;
-      width: 100%;
-      max-width: 520px;
+    .visual-box {
+      position: relative;
+      overflow: hidden;
+      border-radius: 2.4rem;
+      background:
+        radial-gradient(circle at 70% 30%, rgba(244,184,63,.12), transparent 30%),
+        linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+      border: 1px solid rgba(177,116,255,.25);
+      box-shadow: 0 35px 100px rgba(0,0,0,.28);
+      min-height: 560px;
     }
 
-    .hero-bg {
-      min-height: 100vh;
-      background: linear-gradient(
-        135deg,
-        #0d366b 0%,
-        #231c7c 40%,
-        #170b72 100%
-      );
-      display: flex;
-      align-items: center;
+    .visual-box::before {
+      content: "";
+      position: absolute;
+      width: 520px;
+      height: 520px;
+      border-radius: 999px;
+      background: rgba(126, 50, 220, .34);
+      filter: blur(110px);
+      right: -90px;
+      top: 40px;
+    }
+
+    .visual-box::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(9,0,43,.45), transparent 35%),
+        linear-gradient(0deg, rgba(9,0,43,.35), transparent 35%);
+      pointer-events: none;
+    }
+
+    .visual-img {
+      position: absolute;
+      right: -55px;
+      bottom: -30px;
+      width: 720px;
+      max-width: none;
+      filter: drop-shadow(0 45px 90px rgba(0,0,0,.55));
+      animation: floatVisual 5s ease-in-out infinite;
+    }
+
+    @keyframes floatVisual {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .input-box {
+      background: rgba(255,255,255,.075);
+      border: 1px solid rgba(255,255,255,.13);
+      color: white;
+      transition: .25s ease;
+    }
+
+    .input-box:focus {
+      outline: none;
+      border-color: rgba(244,184,63,.65);
+      box-shadow: 0 0 0 4px rgba(244,184,63,.08);
+    }
+
+    input::placeholder {
+      color: rgba(255,255,255,.45);
     }
 
     .loader {
       position: fixed;
       inset: 0;
-      background: #0d126c;
+      background: #070022;
       z-index: 99999;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      transform: translateY(0);
-      opacity: 1;
-      visibility: visible;
-      transition: transform 0.8s ease, opacity 0.6s ease, visibility 0.6s ease;
+      transition: transform .8s ease, opacity .6s ease, visibility .6s ease;
     }
 
     .loader.hide {
@@ -130,44 +149,39 @@
     .loader-bar-bg {
       width: 220px;
       height: 3px;
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255,255,255,.12);
       margin-top: 18px;
       overflow: hidden;
-      position: relative;
       border-radius: 999px;
     }
 
     .loader-bar {
       width: 0%;
       height: 100%;
-      background: linear-gradient(90deg, #6E4B0D, #F7E7A1, #D4AF37);
-      position: absolute;
-      left: 0;
-      top: 0;
+      background: linear-gradient(90deg, #B97810, #F8D36A, #F4B83F);
       border-radius: 999px;
       transition: width 1.2s ease;
     }
 
-    input {
-      color: white;
-    }
-
-    input::placeholder {
-      color: rgba(255,255,255,0.55);
-    }
-
-    input:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(212,175,55,0.35);
-    }
-
-    @media (max-width: 1023px) {
-      .mobile-stack {
-        grid-template-columns: 1fr !important;
+    @media (max-width: 1024px) {
+      .visual-box {
+        min-height: 440px;
       }
 
-      .mobile-center {
-        justify-content: center !important;
+      .visual-img {
+        width: 600px;
+        right: -90px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .visual-box {
+        min-height: 360px;
+      }
+
+      .visual-img {
+        width: 480px;
+        right: -130px;
       }
     }
   </style>
@@ -176,85 +190,93 @@
 <body>
 
   <div class="loader" id="loader">
-    <div class="text-white font-display text-3xl tracking-[0.25em] uppercase">
-      Dhaman<span class="gold-metallic-text">Pay</span>
-    </div>
+    <img src="./logo.png" alt="DhamanPay" class="w-32 mb-4">
     <div class="loader-bar-bg">
       <div class="loader-bar" id="loader-bar"></div>
     </div>
   </div>
 
-  <section class="hero-bg">
-    <div class="max-w-7xl mx-auto w-full px-6 grid lg:grid-cols-[1fr_1fr] gap-12 items-center mobile-stack">
+  <main class="min-h-screen flex items-center px-6 md:px-12 py-10">
+    <div class="max-w-[1500px] mx-auto w-full grid lg:grid-cols-[1.1fr_.9fr] gap-10 items-center">
 
-      <div class="flex justify-center mobile-center">
-        <div class="logo-box">
-          <h1 class="text-6xl font-display tracking-widest">
-            Dhaman<span class="gold-metallic-text">Pay</span>
-          </h1>
+      <!-- LEFT VISUAL -->
+      <section class="visual-box hidden md:block">
+        <div class="relative z-10 p-10">
+          <img src="./logo.png" alt="DhamanPay" class="w-36 mb-8">
+      
         </div>
-      </div>
 
-      <div class="flex justify-end mobile-center">
-        <div class="w-full max-w-md glass-card rounded-3xl p-8">
+        <img src="./visual.png" alt="DhamanPay secure escrow visual" class="visual-img">
+      </section>
 
-          <h2 class="text-2xl font-display mb-6 text-center">
-            Login to <span class="gold-metallic-text">DhamanPay</span>
-          </h2>
+      <!-- RIGHT FORM -->
+      <section class="flex justify-center lg:justify-end">
+        <div class="w-full max-w-[520px] glass-card rounded-[2.2rem] p-8 md:p-10">
+          <div class="text-center mb-8">
+            <img src="./logo.png" alt="DhamanPay" class="w-28 mx-auto mb-5 md:hidden">
+            <h2 class="text-3xl font-extrabold">
+              Login to <span class="gold-text">DhamanPay</span>
+            </h2>
+            <p class="text-white/55 mt-3">
+              Enter your phone number and password to continue.
+            </p>
+          </div>
 
           <form id="loginForm" class="space-y-6">
             <div>
-              <label class="text-sm mb-2 block">Phone</label>
-              <input
-                type="tel"
-                id="phone"
-                class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20"
-                placeholder="0557000101"
-              >
+              <label class="text-sm mb-2 block font-bold text-white/85">Phone</label>
+              <div class="relative">
+                <i class="ph ph-phone absolute left-4 top-1/2 -translate-y-1/2 text-white/45 text-xl"></i>
+                <input
+                  type="tel"
+                  id="phone"
+                  class="input-box w-full pl-12 pr-4 py-4 rounded-2xl"
+                  placeholder="0557000101"
+                >
+              </div>
             </div>
 
             <div>
-              <label class="text-sm mb-2 block">Password</label>
+              <label class="text-sm mb-2 block font-bold text-white/85">Password</label>
               <div class="relative">
+                <i class="ph ph-lock-key absolute left-4 top-1/2 -translate-y-1/2 text-white/45 text-xl"></i>
                 <input
                   type="password"
                   id="password"
-                  class="w-full px-4 py-3 pr-12 rounded-xl bg-white/10 border border-white/20"
+                  class="input-box w-full pl-12 pr-12 py-4 rounded-2xl"
                   placeholder="Enter password"
                 >
                 <button
                   type="button"
                   id="togglePass"
-                  class="absolute right-4 top-1/2 -translate-y-1/2 text-white/60"
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50"
                 >
                   <i class="ph ph-eye"></i>
                 </button>
               </div>
             </div>
 
-            <div id="msg" class="hidden text-sm rounded-xl px-3 py-2"></div>
+            <div id="msg" class="hidden text-sm rounded-xl px-4 py-3"></div>
 
-            <button id="loginBtn" type="submit" class="w-full py-3 rounded-xl gold-button uppercase text-sm">
+            <button id="loginBtn" type="submit" class="w-full py-4 rounded-2xl gold-button uppercase text-sm tracking-[0.18em]">
               Login
             </button>
           </form>
 
-          <p class="text-center mt-6 text-sm text-white/60">
-            Don't have an account?
-            <a href="loginn.html" class="text-yellow-400 font-bold">Register</a>
+          <p class="text-center mt-7 text-sm text-white/55">
+            Don’t have an account?
+            <a href="loginn.html" class="text-[#F4B83F] font-extrabold">Register</a>
           </p>
-
         </div>
-      </div>
+      </section>
 
     </div>
-  </section>
-
+  </main>
 
   <script src="../js/api.js"></script>
-  
-<script>
-  
+  <script src="api.js"></script>
+
+  <script>
     const loginForm = document.getElementById('loginForm');
     const phoneInput = document.getElementById('phone');
     const passwordInput = document.getElementById('password');
@@ -263,14 +285,16 @@
     const togglePass = document.getElementById('togglePass');
 
     function showMessage(text, type = 'error') {
-      msg.classList.remove('hidden', 'text-red-400', 'text-green-400', 'text-white/80');
+      msg.classList.remove('hidden', 'text-red-300', 'text-green-300', 'text-white/80', 'bg-red-500/10', 'bg-green-500/10', 'bg-white/10');
+
       if (type === 'success') {
-        msg.classList.add('text-green-400');
+        msg.classList.add('text-green-300', 'bg-green-500/10');
       } else if (type === 'loading') {
-        msg.classList.add('text-white/80');
+        msg.classList.add('text-white/80', 'bg-white/10');
       } else {
-        msg.classList.add('text-red-400');
+        msg.classList.add('text-red-300', 'bg-red-500/10');
       }
+
       msg.textContent = text;
     }
 
@@ -296,6 +320,8 @@
       loginBtn.textContent = 'Loading...';
 
       try {
+        localStorage.setItem("DHAMANPAY_API_BASE", "https://dhamanpay.onrender.com/api");
+
         const result = await loginUser(phone, password);
 
         if (!result.token) {
@@ -303,7 +329,7 @@
         }
 
         saveToken(result.token);
-          localStorage.setItem("DHAMANPAY_API_BASE","https://dhamanpay.onrender.com/api");
+
         const me = await getMe();
         const user = me.data || result.data;
 
@@ -313,21 +339,22 @@
 
         showMessage(result.message || 'Login successful.', 'success');
 
-        if (user.role === 'merchant') {
-          window.location.href = 'merchant1.html';
-        } else if (user.role === 'customer') {
-          window.location.href = 'customer.html';
-        } else if (user.role === 'courier') {
-          window.location.href = 'courier.html';
-        } else if (user.role === 'admin') {
-          window.location.href = 'admin.html';
-        } else {
-          throw new Error('Unknown role returned by backend.');
-        }
+        setTimeout(() => {
+          if (user.role === 'merchant') {
+            window.location.href = 'merchant1.html';
+          } else if (user.role === 'customer') {
+            window.location.href = 'customer.html';
+          } else if (user.role === 'courier') {
+            window.location.href = 'courier.html';
+          } else if (user.role === 'admin') {
+            window.location.href = 'admin1.html';
+          } else {
+            showMessage('Unknown role returned by backend.');
+          }
+        }, 400);
 
       } catch (error) {
         showMessage(error.message || 'Login failed.');
-      } finally {
         loginBtn.disabled = false;
         loginBtn.textContent = 'Login';
       }
@@ -346,7 +373,5 @@
       }, 1400);
     });
   </script>
-    <script src="api.js"></script>
-
 </body>
 </html>
