@@ -188,3 +188,30 @@ async function getTransactions() {
 async function getDisputes() {
   return apiRequest("/disputes", "GET", null, true);
 }
+window.registerUser = registerUser;
+window.loginUser = loginUser;
+window.getMe = getMe;
+window.logoutUser = logoutUser;
+
+window.getOrders = getOrders;
+window.getOrderById = getOrderById;
+window.getOrderHistory = getOrderHistory;
+
+window.searchCustomers = searchCustomers;
+window.createOrder = createOrder;
+
+window.confirmOrder = confirmOrder;
+window.cancelOrder = cancelOrder;
+window.openDispute = openDispute;
+
+window.shipOrder = shipOrder;
+window.submitProof = submitProof;
+window.getCourierProfile = getCourierProfile;
+
+window.releaseOrder = releaseOrder;
+window.refundOrder = refundOrder;
+window.addMoney = addMoney;
+
+window.getWallet = getWallet;
+window.getTransactions = getTransactions;
+window.getDisputes = getDisputes;
