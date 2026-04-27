@@ -10,6 +10,7 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
       --gold-1: #f9d56c;
       --gold-2: #f4b83f;
@@ -66,28 +67,7 @@
         linear-gradient(135deg, #070022 0%, #160044 50%, #09002b 100%);
     }
 
-    #slide2 {
-      background:
-        radial-gradient(ellipse 60% 55% at 90% 20%, rgba(100,30,180,0.5) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 45% at 12% 80%, rgba(118,42,190,0.42) 0%, transparent 55%),
-        linear-gradient(145deg, #09002b 0%, #130038 50%, #070022 100%);
-    }
-
-    #slide3 {
-      background:
-        radial-gradient(ellipse 65% 55% at 10% 30%, rgba(118,42,190,0.55) 0%, transparent 60%),
-        radial-gradient(ellipse 45% 40% at 85% 70%, rgba(100,30,180,0.4) 0%, transparent 55%),
-        linear-gradient(155deg, #0a0028 0%, #160044 50%, #070022 100%);
-    }
-
-    #slide4 {
-      background:
-        radial-gradient(ellipse 80% 60% at 50% 60%, rgba(118,42,190,0.5) 0%, transparent 65%),
-        radial-gradient(ellipse 40% 35% at 20% 20%, rgba(244,184,63,0.07) 0%, transparent 50%),
-        linear-gradient(180deg, #09002b 0%, #160044 60%, #070022 100%);
-    }
-
-    #slide5 {
+    #slide2, #slide3, #slide4, #slide5 {
       background:
         radial-gradient(ellipse 65% 55% at 88% 22%, rgba(118,42,190,0.48) 0%, transparent 58%),
         radial-gradient(ellipse 45% 40% at 14% 78%, rgba(244,184,63,0.08) 0%, transparent 50%),
@@ -117,12 +97,12 @@
       color: #070022;
       font-weight: 900;
       box-shadow: 0 16px 48px rgba(244,184,63,0.28), 0 2px 8px rgba(244,184,63,0.2);
-      transition: transform 0.22s ease, box-shadow 0.22s ease;
+      transition: 0.25s ease;
     }
 
     .gold-btn:hover {
       transform: translateY(-3px);
-      box-shadow: 0 24px 72px rgba(244,184,63,0.40), 0 4px 16px rgba(244,184,63,0.3);
+      box-shadow: 0 24px 72px rgba(244,184,63,0.40);
     }
 
     .ghost-btn {
@@ -131,7 +111,7 @@
       color: #fff;
       font-weight: 900;
       backdrop-filter: blur(8px);
-      transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
+      transition: 0.25s ease;
     }
 
     .ghost-btn:hover {
@@ -154,7 +134,7 @@
       width: 100%;
       z-index: 30;
       padding: 26px 54px;
-      background: linear-gradient(180deg, rgba(7,0,34,0.7) 0%, transparent 100%);
+      background: linear-gradient(180deg, rgba(7,0,34,0.7), transparent);
     }
 
     .hero-header-inner {
@@ -182,29 +162,22 @@
       color: rgba(255,255,255,0.80);
     }
 
-    .nav a {
+    .nav a, .header-actions a {
       text-decoration: none;
       color: inherit;
       transition: color 0.2s;
       white-space: nowrap;
     }
 
-    .nav a:hover { color: var(--gold-2); }
+    .nav a:hover, .header-actions a:hover { color: var(--gold-2); }
 
     .header-actions {
       display: flex;
       align-items: center;
       gap: 18px;
       font-weight: 800;
-    }
-
-    .header-actions a {
-      text-decoration: none;
-      transition: color 0.2s;
       color: rgba(255,255,255,0.84);
     }
-
-    .header-actions a:first-child:hover { color: var(--gold-2); }
 
     .small-pill {
       padding: 13px 26px;
@@ -225,8 +198,6 @@
       gap: 32px;
     }
 
-    .hero-left { padding-top: 32px; }
-
     .badge {
       display: inline-flex;
       align-items: center;
@@ -240,7 +211,6 @@
       font-size: 14.5px;
       margin-bottom: 38px;
       box-shadow: 0 0 36px rgba(244,184,63,0.09);
-      letter-spacing: 0.01em;
     }
 
     .badge i { font-size: 18px; }
@@ -268,7 +238,8 @@
       flex-wrap: wrap;
     }
 
-    .hero-buttons a {
+    .hero-buttons a,
+    .final-actions a {
       text-decoration: none;
       min-width: 210px;
       height: 64px;
@@ -294,7 +265,6 @@
     .stat-num {
       font-size: 32px;
       font-weight: 900;
-      letter-spacing: -0.04em;
       background: linear-gradient(100deg, #f9d56c, #f4b83f);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -314,20 +284,6 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-    }
-
-    .hero-right::before {
-      content: "";
-      position: absolute;
-      width: 700px;
-      height: 700px;
-      border-radius: 999px;
-      background: radial-gradient(circle, rgba(126,50,220,0.30), transparent 68%);
-      filter: blur(20px);
-      pointer-events: none;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
     }
 
     .visual-wrap {
@@ -354,7 +310,7 @@
       z-index: 3;
       left: 0; top: 0; bottom: 0;
       width: 140px;
-      background: linear-gradient(90deg, rgba(22,0,68,0.85) 0%, transparent 100%);
+      background: linear-gradient(90deg, rgba(22,0,68,0.85), transparent);
       pointer-events: none;
     }
 
@@ -363,7 +319,7 @@
       z-index: 3;
       left: 0; right: 0; bottom: 0;
       height: 100px;
-      background: linear-gradient(0deg, rgba(12,0,40,0.80) 0%, transparent 100%);
+      background: linear-gradient(0deg, rgba(12,0,40,0.80), transparent);
       pointer-events: none;
     }
 
@@ -381,7 +337,6 @@
       border: 1px solid rgba(244,184,63,0.30);
       backdrop-filter: blur(16px);
       box-shadow: 0 16px 48px rgba(0,0,0,0.45);
-      color: #fff;
       font-size: 14px;
       font-weight: 800;
       white-space: nowrap;
@@ -406,7 +361,7 @@
       justify-content: center;
       font-size: 28px;
       cursor: pointer;
-      transition: background 0.22s, color 0.22s, transform 0.22s;
+      transition: 0.25s;
     }
 
     .slide-btn:hover {
@@ -455,23 +410,14 @@
     .step-card {
       position: relative;
       padding: 32px 26px 28px;
-      transition: transform 0.22s ease, border-color 0.22s ease;
+      transition: 0.22s ease;
     }
 
-    .step-card:hover {
+    .step-card:hover,
+    .faq-card:hover,
+    .contact-card:hover {
       transform: translateY(-5px);
       border-color: rgba(244,184,63,0.3);
-    }
-
-    .step-card:not(:last-child)::after {
-      content: "";
-      position: absolute;
-      right: -10px;
-      top: 50px;
-      width: 20px;
-      height: 2px;
-      background: linear-gradient(90deg, rgba(244,184,63,0.55), rgba(244,184,63,0.10));
-      z-index: 5;
     }
 
     .step-number {
@@ -496,8 +442,23 @@
       margin-bottom: 18px;
     }
 
-    .step-card h3 { font-size: 20px; font-weight: 900; margin-bottom: 10px; }
-    .step-card p { font-size: 13.5px; color: rgba(255,255,255,0.58); line-height: 1.65; }
+    .step-card h3,
+    .faq-card h3,
+    .contact-card h3 {
+      font-size: 20px;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .step-card p,
+    .faq-card p,
+    .contact-card p,
+    .contact-card a {
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.60);
+      line-height: 1.65;
+      text-decoration: none;
+    }
 
     .faq-grid {
       margin-top: 48px;
@@ -506,27 +467,10 @@
       gap: 18px;
     }
 
-    .faq-card {
-      padding: 26px 26px;
-      border-radius: 24px;
-      transition: transform 0.22s ease, border-color 0.22s ease;
-    }
-
-    .faq-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(244,184,63,0.28);
-    }
-
-    .faq-card h3 {
-      font-size: 18px;
-      font-weight: 900;
-      margin-bottom: 10px;
-    }
-
-    .faq-card p {
-      font-size: 13.5px;
-      color: rgba(255,255,255,0.60);
-      line-height: 1.65;
+    .faq-card,
+    .contact-card {
+      padding: 26px;
+      transition: 0.22s ease;
     }
 
     .about-layout {
@@ -556,38 +500,12 @@
       gap: 18px;
     }
 
-    .contact-card {
-      padding: 30px 28px;
-      border-radius: 24px;
-      transition: transform 0.22s, border-color 0.22s;
-    }
-
-    .contact-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(244,184,63,0.28);
-    }
-
     .contact-card i {
       color: var(--gold-2);
       font-size: 34px;
       margin-bottom: 18px;
       display: block;
     }
-
-    .contact-card h3 {
-      font-size: 19px;
-      font-weight: 900;
-      margin-bottom: 10px;
-    }
-
-    .contact-card p, .contact-card a {
-      font-size: 14px;
-      color: rgba(255,255,255,0.62);
-      line-height: 1.65;
-      text-decoration: none;
-    }
-
-    .contact-card a:hover { color: var(--gold-2); }
 
     .final-slide {
       display: flex;
@@ -625,19 +543,6 @@
       gap: 18px;
       margin-top: 44px;
       flex-wrap: wrap;
-    }
-
-    .final-actions a {
-      text-decoration: none;
-      min-width: 220px;
-      height: 68px;
-      border-radius: 16px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      font-size: 18px;
-      font-weight: 900;
     }
 
     .trust-row {
@@ -690,25 +595,23 @@
     @media (max-width: 1300px) {
       .workflow-grid { grid-template-columns: repeat(3, 1fr); }
       .faq-grid { grid-template-columns: repeat(2, 1fr); }
-      .step-card:nth-child(3)::after { display: none; }
     }
 
     @media (max-width: 1024px) {
       html, body { overflow: auto; }
       .slides { overflow-y: auto; scroll-snap-type: none; }
       .slide { height: auto; min-height: 100vh; }
-      .hero-header { position: relative; padding: 22px 22px; }
+      .hero-header { position: relative; padding: 22px; }
       .nav, .header-actions .small-pill { display: none; }
       .hero-content { padding: 20px 22px 60px; grid-template-columns: 1fr; }
       .hero-right { height: auto; }
       .visual-wrap { width: 100%; height: auto; border-radius: 18px; }
       .visual-wrap img { height: auto; object-fit: contain; transform: none; }
       .visual-fade-left { display: none; }
-      .trust-badge { left: 8px; }
+      .trust-badge { left: 8px; bottom: 20px; }
       .workflow-grid, .faq-grid, .contact-grid, .about-layout { grid-template-columns: 1fr; }
       .about-layout, .center-wrap { padding: 70px 22px; }
       .slide-btn { display: none; }
-      .step-card::after { display: none; }
     }
 
     @media (max-width: 600px) {
@@ -746,11 +649,13 @@
         <div class="hero-left">
           <div class="badge">
             <i class="ph-fill ph-shield-check"></i>
-            Secure Escrow — Trusted by Buyers & amp ; Sellers
+            Secure Escrow — Trusted by Buyers & Sellers
           </div>
+
           <h1 class="hero-title">
-Zero Risk ... <br> Full <span class="gold-text"> Dhaman</span>
-</h1>
+            Zero Risk ... <br> Full <span class="gold-text">Dhaman</span>
+          </h1>
+
           <p class="hero-copy">
             DhamanPay holds your payment in secure escrow until delivery is verified.
             Safe for buyers. Fair for sellers. Dispute-ready for everyone.
@@ -776,12 +681,14 @@ Zero Risk ... <br> Full <span class="gold-text"> Dhaman</span>
             </div>
           </div>
         </div>
+
         <div class="hero-right">
           <div class="visual-wrap">
             <img src="./visual.png" alt="DhamanPay dashboard visual" />
             <div class="visual-fade-left"></div>
             <div class="visual-fade-bottom"></div>
           </div>
+
           <div class="trust-badge">
             <i class="ph-fill ph-seal-check"></i>
             Funds held safely until delivery
@@ -800,8 +707,6 @@ Zero Risk ... <br> Full <span class="gold-text"> Dhaman</span>
     </section>
 
     <section class="slide" id="slide2">
-      <div class="dot-grid" style="right:-40px; bottom:10%;"></div>
-
       <div class="center-wrap">
         <p class="section-label">Workflow</p>
         <h2 class="section-title">
@@ -905,8 +810,6 @@ Zero Risk ... <br> Full <span class="gold-text"> Dhaman</span>
     </section>
 
     <section class="slide" id="slide4">
-      <div class="dot-grid" style="left:-60px; top:20%;"></div>
-
       <div class="about-layout">
         <div>
           <p class="section-label">Who are we</p>
@@ -914,10 +817,12 @@ Zero Risk ... <br> Full <span class="gold-text"> Dhaman</span>
             We are building trust<br>
             for online commerce.
           </h2>
+
           <p class="about-copy">
             DhamanPay is a secure transaction layer designed for buyers and sellers who already agree outside the platform.
             Our role is simple: protect the money, organize the workflow, and make every step clear.
           </p>
+
           <p class="about-copy">
             We focus on safer digital transactions in Algeria, combining escrow payment, order tracking, courier proof,
             and admin dispute resolution in one clean experience.
@@ -960,12 +865,13 @@ Zero Risk ... <br> Full <span class="gold-text"> Dhaman</span>
     </section>
 
     <section class="slide final-slide" id="slide5">
-      <div class="dot-grid" style="left:50%;transform:translateX(-50%);top:5%;opacity:0.22;"></div>
-
       <div style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;">
         <img class="final-logo" src="./logo.png" alt="DhamanPay" />
+
         <p class="section-label">Start now</p>
+
         <h2>Ready to secure your<br>next transaction?</h2>
+
         <p>Join DhamanPay and protect your online buying and selling with confidence.</p>
 
         <div class="final-actions">
@@ -974,7 +880,7 @@ Zero Risk ... <br> Full <span class="gold-text"> Dhaman</span>
         </div>
 
         <div class="trust-row">
-          <div class="trust-item"><i class="ph-fill ph-shield-check"></i> Escrow Protected</div>
+            <img src="logo.png" alt="DhamanPay" class="w-14 h-14 object-contain">
           <div class="trust-item"><i class="ph-fill ph-clock-countdown"></i> Real-time Tracking</div>
           <div class="trust-item"><i class="ph-fill ph-scales"></i> Dispute Resolution</div>
           <div class="trust-item"><i class="ph-fill ph-users-three"></i> 4 Role Dashboards</div>
@@ -990,18 +896,27 @@ Zero Risk ... <br> Full <span class="gold-text"> Dhaman</span>
 
   <script>
     function goToSlide(n) {
-      document.getElementById("slide" + n).scrollIntoView({ behavior: "smooth" });
+      const target = document.getElementById("slide" + n);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth" });
+      }
     }
 
     document.addEventListener("keydown", (e) => {
       const slides = document.querySelectorAll(".slide");
-      const current = [...slides].findIndex(s => {
+
+      const current = [...slides].findIndex((s) => {
         const r = s.getBoundingClientRect();
         return r.top >= -10 && r.top < window.innerHeight / 2;
       });
 
-      if (e.key === "ArrowDown" && current < slides.length - 1) goToSlide(current + 2);
-      if (e.key === "ArrowUp" && current > 0) goToSlide(current);
+      if (e.key === "ArrowDown" && current < slides.length - 1) {
+        goToSlide(current + 2);
+      }
+
+      if (e.key === "ArrowUp" && current > 0) {
+        goToSlide(current);
+      }
     });
   </script>
 </body>

@@ -1,227 +1,268 @@
-// ======================
-// BASE URL (FINAL)
-// ======================
-const BASE_URL =
-  localStorage.getItem("DHAMANPAY_API_BASE") ||
-  "https://dhamanpay.onrender.com/api";
+(function () {
 
-let currentMerchant = null;
+const API_BASE = "https://dhamanpay.onrender.com/api";
+const LOGIN_PAGE = "login.html";
+
 let orders = [];
+let merchant = null;
 let selectedCustomer = null;
 
-if (!getToken()) {
-  window.location.href = 'login.html';
+// =======================
+// TOKEN
+// =======================
+function getToken() {
+  return localStorage.getItem("token");
 }
 
-// ======================
+// =======================
 // HELPERS
-// ======================
+// =======================
+function el(id) {
+  return document.getElementById(id);
+}
+
 function setText(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = value ?? '—';
+  const e = el(id);
+  if (e) e.textContent = value ?? "—";
 }
 
-function formatMoney(value) {
-  return `${Number(value || 0).toLocaleString()} DZD`;
-}
-
-// ======================
-// MESSAGES
-// ======================
-function showFormMessage(text, success = false) {
-  const box = document.getElementById('formMessage');
+function showMessage(id, text, type = "info") {
+  const box = el(id);
   if (!box) return;
 
-  box.className = 'rounded-2xl p-4 text-sm';
-  box.classList.add(success ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700');
+  box.className = "message-box";
+
+  if (type === "success") box.classList.add("success");
+  else if (type === "error") box.classList.add("error");
+  else box.classList.add("info");
+
   box.textContent = text;
 }
 
-function showSearchMessage(text, success = false) {
-  const box = document.getElementById('customerSearchMessage');
-  if (!box) return;
+// =======================
+// API
+// =======================
+async function apiFetch(path, method = "GET", body = null) {
+  const token = getToken();
 
-  box.className = 'mt-3 rounded-2xl p-3 text-sm';
-  box.classList.add(success ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700');
-  box.textContent = text;
-}
-
-// ======================
-// LOAD PROFILE
-// ======================
-async function loadMeData() {
-  try {
-    const res = await getMe();
-    currentMerchant = res.data || {};
-
-    console.log('MERCHANT DATA:', currentMerchant);
-
-    setText('heroStoreName', currentMerchant.store_name);
-    setText('heroMerchantName', currentMerchant.full_name);
-
-    setText('merchantName', currentMerchant.full_name);
-    setText('merchantRole', currentMerchant.role?.toUpperCase());
-    setText('merchantStoreName', currentMerchant.store_name);
-    setText('merchantEmail', currentMerchant.email);
-    setText('merchantPhone', currentMerchant.phone);
-    setText('merchantId', currentMerchant.id);
-    setText('merchantCommercialRegister', currentMerchant.commercial_register);
-
-    setText('merchantStoreNameCard', currentMerchant.store_name);
-    setText('merchantCommercialRegisterCard', currentMerchant.commercial_register);
-  } catch (err) {
-    console.error(err);
-    window.location.href = 'login.html';
+  if (!token) {
+    window.location.href = LOGIN_PAGE;
+    return;
   }
+
+  const res = await fetch(API_BASE + path, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: body ? JSON.stringify(body) : null
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) throw new Error(data.message || "API Error");
+
+  return data;
 }
 
-// ======================
+// =======================
+// LOAD PROFILE
+// =======================
+async function loadProfile() {
+  const res = await apiFetch("/me");
+  merchant = res.data;
+
+  setText("merchantName", merchant.full_name);
+  setText("merchantRole", merchant.role?.toUpperCase());
+
+  setText("merchantStoreName", merchant.store_name);
+  setText("merchantEmail", merchant.email);
+  setText("merchantPhone", merchant.phone);
+  setText("merchantId", merchant.id);
+  setText("merchantCommercialRegister", merchant.commercial_register);
+
+  setText("merchantStoreNameCard", merchant.store_name);
+  setText("merchantCommercialRegisterCard", merchant.commercial_register);
+
+  setText("heroStoreName", merchant.store_name);
+  setText("heroMerchantName", merchant.full_name);
+}
+
+// =======================
 // CUSTOMER SEARCH
-// ======================
-async function searchCustomerUI() {
-  const name = document.getElementById('customerSearchName').value.trim();
-  const phone = document.getElementById('customerSearchPhone').value.trim();
+// =======================
+async function searchCustomer() {
+  const name = el("customerSearchName").value.trim();
+  const phone = el("customerSearchPhone").value.trim();
 
   if (!name && !phone) {
-    showSearchMessage('Enter name or phone.');
+    showMessage("customerSearchMessage", "Enter name or phone", "error");
     return;
   }
 
   try {
-    const res = await searchCustomers(name, phone);
-    const customers = res.data || [];
+    const res = await apiFetch(`/customers/search?full_name=${name}&phone=${phone}`);
+    const customers = res.data;
 
-    const box = document.getElementById('customerSearchResults');
-    box.innerHTML = '';
-
-    if (!customers.length) {
-      showSearchMessage('No customer found');
-      return;
-    }
-
-    showSearchMessage('Customers found', true);
+    const box = el("customerSearchResults");
+    box.innerHTML = "";
 
     customers.forEach(c => {
-      const btn = document.createElement('button');
-      btn.className = 'w-full text-left p-4 border rounded-xl hover:bg-blue-50';
-      btn.innerHTML = `
+      const div = document.createElement("div");
+      div.className = "list-card";
+      div.innerHTML = `
         <b>${c.full_name}</b><br>
-        ${c.phone} <br>
+        Phone: ${c.phone}<br>
         ID: ${c.id}
       `;
 
-      btn.onclick = () => {
+      div.onclick = () => {
         selectedCustomer = c;
-        const input = document.getElementById('customerId');
-        input.value = `${c.full_name} (#${c.id})`;
-        input.dataset.customerId = c.id;
+        el("customerId").value = `${c.full_name} (#${c.id})`;
       };
 
-      box.appendChild(btn);
+      box.appendChild(div);
     });
 
-  } catch (err) {
-    showSearchMessage(err.message);
+  } catch (e) {
+    showMessage("customerSearchMessage", e.message, "error");
   }
 }
 
-// ======================
-// CREATE ORDER (IMPORTANT FIX)
-// ======================
-async function createOrderUI(e) {
+// =======================
+// CREATE ORDER
+// =======================
+async function createOrder(e) {
   e.preventDefault();
 
-  const customerId = document.getElementById('customerId').dataset.customerId;
-  const amount = Number(document.getElementById('amount').value);
-  const address = document.getElementById('deliveryAddress').value.trim();
-  const product = document.getElementById('productName').value.trim();
-  const serial = document.getElementById('expectedSerialNumber').value.trim();
+  if (!selectedCustomer) {
+    showMessage("formMessage", "Select a customer first", "error");
+    return;
+  }
 
-  if (!customerId) return showFormMessage('Select customer first');
-  if (!amount) return showFormMessage('Enter amount');
-  if (!address || !product || !serial) return showFormMessage('Fill all fields');
+  const payload = {
+    customer_id: selectedCustomer.id,
+    amount: Number(el("amount").value),
+    delivery_address: el("deliveryAddress").value,
+    product_name: el("productName").value,
+    expected_serial_number: el("expectedSerialNumber").value
+  };
 
   try {
-    const res = await createOrder({
-      customer_id: Number(customerId),
-      amount,
-      delivery_address: address,
-      product_name: product,
-      expected_serial_number: serial
-    });
+    await apiFetch("/orders", "POST", payload);
 
-    showFormMessage('Order created successfully (code generated by backend)', true);
+    showMessage("formMessage", "Order created successfully", "success");
 
-    document.getElementById('createOrderForm').reset();
-    document.getElementById('customerId').dataset.customerId = '';
+    e.target.reset();
+    selectedCustomer = null;
+    el("customerId").value = "";
 
-    await loadOrders();
+    loadOrders();
 
   } catch (err) {
-    showFormMessage(err.message);
+    showMessage("formMessage", err.message, "error");
   }
 }
 
-// ======================
-// ORDERS
-// ======================
-function normalizeOrder(o) {
-  return {
-    id: o.id,
-    code: o.order_code || o.code,
-    customer: o.customer?.full_name || `#${o.customer_id}`,
-    amount: o.amount,
-    status: o.status,
-    product: o.product_name,
-    serial: o.expected_serial_number,
-    address: o.delivery_address
-  };
+// =======================
+// LOAD ORDERS
+// =======================
+async function loadOrders() {
+  try {
+    const res = await apiFetch("/orders");
+    orders = res.data || [];
+
+    renderOrders();
+    renderStats();
+
+  } catch (e) {
+    console.error(e);
+  }
 }
 
+// =======================
+// RENDER ORDERS
+// =======================
 function renderOrders() {
-  const box = document.getElementById('ordersList');
-  box.innerHTML = '';
+  const container = el("ordersList");
+  container.innerHTML = "";
+
+  if (!orders.length) {
+    el("emptyState").style.display = "block";
+    return;
+  }
+
+  el("emptyState").style.display = "none";
 
   orders.forEach(o => {
-    const card = document.createElement('div');
-    card.className = 'p-4 border rounded-xl';
+    const div = document.createElement("div");
+    div.className = "list-card";
 
-    card.innerHTML = `
-      <b>${o.code}</b><br>
-      ${o.customer}<br>
-      ${o.product}<br>
-      ${o.serial}<br>
-      ${o.address}<br>
-      ${formatMoney(o.amount)}<br>
-      ${o.status}
+    div.innerHTML = `
+      <b>#${o.id}</b> — ${o.status}<br>
+      ${o.product_name} | ${o.amount} DZD<br>
+      ${o.delivery_address}
     `;
 
-    box.appendChild(card);
+    container.appendChild(div);
   });
 }
 
-async function loadOrders() {
-  const res = await getOrders();
-  orders = (res.data || []).map(normalizeOrder);
-  renderOrders();
+// =======================
+// STATS
+// =======================
+function renderStats() {
+  let earned = 0;
+  let pending = 0;
+  let active = 0;
+  let completed = 0;
+
+  orders.forEach(o => {
+    if (o.status === "COMPLETED") {
+      earned += o.amount;
+      completed++;
+    } else {
+      active++;
+      pending += o.amount;
+    }
+  });
+
+  setText("heroEarned", earned + " DZD");
+  setText("heroPending", pending + " DZD");
+  setText("heroActive", active);
+  setText("heroCompleted", completed);
+
+  setText("totalEarned", earned + " DZD");
+  setText("pendingEscrow", pending + " DZD");
+  setText("visibleOrders", orders.length);
+  setText("completedOrders", completed);
 }
 
-// ======================
+// =======================
 // LOGOUT
-// ======================
-async function logoutUI() {
-  clearToken();
-  window.location.href = 'login.html';
+// =======================
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = LOGIN_PAGE;
 }
 
-// ======================
+// =======================
 // INIT
-// ======================
-document.addEventListener('DOMContentLoaded', async () => {
-  await loadMeData();
-  await loadOrders();
+// =======================
+document.addEventListener("DOMContentLoaded", () => {
 
-  document.getElementById('searchCustomerBtn').onclick = searchCustomerUI;
-  document.getElementById('createOrderForm').onsubmit = createOrderUI;
-  document.getElementById('logoutBtn').onclick = logoutUI;
+  if (!getToken()) {
+    window.location.href = LOGIN_PAGE;
+    return;
+  }
+
+  el("searchCustomerBtn").onclick = searchCustomer;
+  el("createOrderForm").onsubmit = createOrder;
+  el("logoutBtn").onclick = logout;
+
+  loadProfile();
+  loadOrders();
+
 });
+})();
