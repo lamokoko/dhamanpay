@@ -4,7 +4,6 @@
 let orders = [];
 let user = null;
 
-
 // ======================
 // HELPERS
 // ======================
@@ -13,6 +12,13 @@ function setText(id, value) {
   if (el) el.textContent = value ?? "—";
 }
 
+function showWalletMessage(text, type = "") {
+  const messageEl = document.getElementById("walletMessage");
+  if (!messageEl) return;
+
+  messageEl.textContent = text;
+  messageEl.className = type ? `message ${type}` : "message";
+}
 
 // ======================
 // LOAD PROFILE
@@ -24,10 +30,8 @@ async function loadProfile() {
 
     console.log("CUSTOMER:", user);
 
-    // HERO
     setText("heroCustomerName", user.full_name);
 
-    // PROFILE
     setText("customerName", user.full_name);
     setText("customerEmail", user.email);
     setText("customerPhone", user.phone);
@@ -41,7 +45,6 @@ async function loadProfile() {
     console.error("PROFILE ERROR:", e);
   }
 }
-
 
 // ======================
 // LOAD ORDERS
@@ -61,22 +64,23 @@ async function loadOrders() {
   }
 }
 
-
 // ======================
 // RENDER ORDERS
 // ======================
 function renderOrders() {
   const container = document.getElementById("ordersList");
+  const emptyState = document.getElementById("emptyState");
+
   if (!container) return;
 
   container.innerHTML = "";
 
   if (!orders.length) {
-    document.getElementById("emptyState").style.display = "block";
+    if (emptyState) emptyState.style.display = "block";
     return;
   }
 
-  document.getElementById("emptyState").style.display = "none";
+  if (emptyState) emptyState.style.display = "none";
 
   orders.forEach(o => {
     const div = document.createElement("div");
@@ -95,12 +99,10 @@ function renderOrders() {
   });
 }
 
-
 // ======================
 // ACTION BUTTONS
 // ======================
 function actionButtons(order) {
-
   if (order.status === "SHIPPED") {
     return `
       <button onclick="confirmOrderUI(${order.id})">Confirm</button>
@@ -108,7 +110,7 @@ function actionButtons(order) {
     `;
   }
 
-  if (order.status === "DELIVERED") {
+  if (order.status === "DELIVERED" || order.status === "DELIVERED_PENDING") {
     return `
       <button onclick="confirmOrderUI(${order.id})">Confirm</button>
       <button onclick="openDisputeUI(${order.id})">Dispute</button>
@@ -118,9 +120,8 @@ function actionButtons(order) {
   return "";
 }
 
-
 // ======================
-// ACTIONS
+// ORDER ACTIONS
 // ======================
 async function confirmOrderUI(id) {
   try {
@@ -152,7 +153,6 @@ async function openDisputeUI(id) {
   }
 }
 
-
 // ======================
 // STATS
 // ======================
@@ -163,7 +163,7 @@ function renderStats() {
 
   orders.forEach(o => {
     if (o.status === "COMPLETED") completed++;
-    else if (o.status === "DISPUTED") disputed++;
+    else if (o.status === "DISPUTED" || o.status === "DISPUTE_OPEN") disputed++;
     else active++;
   });
 
@@ -176,6 +176,43 @@ function renderStats() {
   setText("disputedOrders", disputed);
 }
 
+// ======================
+// TOP UP MONEY
+// requires window.topUpWallet(amount) in api.js
+// ======================
+async function topUpMoney() {
+  const amountInput = document.getElementById("topUpAmount");
+
+  if (!amountInput) {
+    console.error("Top up amount input not found");
+    return;
+  }
+
+  const amount = Number(amountInput.value);
+
+  if (!amount || amount <= 0) {
+    showWalletMessage("Please enter a valid amount.", "error");
+    return;
+  }
+
+  if (typeof topUpWallet !== "function") {
+    showWalletMessage("topUpWallet() is missing in api.js.", "error");
+    return;
+  }
+
+  try {
+    showWalletMessage("Adding money...");
+
+    await topUpWallet(amount);
+
+    showWalletMessage(`Successfully added ${amount} DZD to wallet!`, "success");
+    amountInput.value = "";
+
+  } catch (e) {
+    console.error("TOP UP ERROR:", e);
+    showWalletMessage(e.message || "Failed to add money.", "error");
+  }
+}
 
 // ======================
 // LOGOUT
@@ -185,12 +222,10 @@ function logout() {
   window.location.href = "login.html";
 }
 
-
 // ======================
 // INIT
 // ======================
 document.addEventListener("DOMContentLoaded", () => {
-
   if (!getToken()) {
     window.location.href = "login.html";
     return;
@@ -198,6 +233,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) logoutBtn.onclick = logout;
+
+  const topUpBtn = document.getElementById("topUpBtn");
+  if (topUpBtn) topUpBtn.onclick = topUpMoney;
 
   loadProfile();
   loadOrders();
