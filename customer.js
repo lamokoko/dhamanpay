@@ -69,27 +69,46 @@ async function loadOrders() {
 // ======================
 function renderOrders() {
   const container = document.getElementById("ordersList");
-  const emptyState = document.getElementById("emptyState");
+  const emptyState = document.getElementById("ordersEmptyState");
 
   if (!container) return;
 
+  const searchValue = (document.getElementById("searchOrdersInput")?.value || "")
+    .trim()
+    .toLowerCase();
+
+  const statusValue = document.getElementById("statusOrdersFilter")?.value || "all";
+
+  const filteredOrders = orders.filter(o => {
+    // Search based on ONE thing only: order ID / order code
+    const orderKey = String(o.code || o.order_code || o.id || "").toLowerCase();
+
+    const matchesSearch = !searchValue || orderKey.includes(searchValue);
+    const matchesStatus = statusValue === "all" || o.status === statusValue;
+
+    return matchesSearch && matchesStatus;
+  });
+
   container.innerHTML = "";
 
-  if (!orders.length) {
-    if (emptyState) emptyState.style.display = "block";
+  if (!filteredOrders.length) {
+    if (emptyState) {
+      emptyState.classList.remove("hidden");
+      emptyState.textContent = "No orders match your search or filter.";
+    }
     return;
   }
 
-  if (emptyState) emptyState.style.display = "none";
+  if (emptyState) emptyState.classList.add("hidden");
 
-  orders.forEach(o => {
+  filteredOrders.forEach(o => {
     const div = document.createElement("div");
     div.className = "list-card";
 
     div.innerHTML = `
       <b>#${o.id}</b> — ${o.status}<br>
-      ${o.product_name} | ${o.amount} DZD<br>
-      ${o.delivery_address}
+      ${o.product_name || o.productName || "—"} | ${o.amount || 0} DZD<br>
+      ${o.delivery_address || o.deliveryAddress || "—"}
       <div style="margin-top:10px;">
         ${actionButtons(o)}
       </div>
@@ -180,6 +199,10 @@ function renderStats() {
 // TOP UP MONEY
 // requires window.topUpWallet(amount) in api.js
 // ======================
+// ======================
+// TOP UP MONEY
+// uses backend /wallets/add-money through window.addMoney(user.id, amount)
+// ======================
 async function topUpMoney() {
   const amountInput = document.getElementById("topUpAmount");
 
@@ -195,15 +218,20 @@ async function topUpMoney() {
     return;
   }
 
-  if (typeof topUpWallet !== "function") {
-    showWalletMessage("topUpWallet() is missing in api.js.", "error");
+  if (!user || !user.id) {
+    showWalletMessage("Profile not loaded yet. Refresh and try again.", "error");
+    return;
+  }
+
+  if (typeof window.addMoney !== "function") {
+    showWalletMessage("addMoney() is missing in api.js.", "error");
     return;
   }
 
   try {
     showWalletMessage("Adding money...");
 
-    await topUpWallet(amount);
+    await window.addMoney(user.id, amount);
 
     showWalletMessage(`Successfully added ${amount} DZD to wallet!`, "success");
     amountInput.value = "";
@@ -213,7 +241,6 @@ async function topUpMoney() {
     showWalletMessage(e.message || "Failed to add money.", "error");
   }
 }
-
 // ======================
 // LOGOUT
 // ======================

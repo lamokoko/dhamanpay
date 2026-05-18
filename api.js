@@ -170,13 +170,9 @@ async function addMoney(userId, amount) {
   return apiRequest("/wallets/add-money", "POST", {
     user_id: userId,
     amount: amount
-  }, true);
-}
-async function topUpWallet(amount) {
-  return apiRequest("/wallets/top-up", "POST", {
-    amount: Number(amount)
-  }, true);
-}
+  }, true);}
+
+
 
 // ======================
 // WALLET / TRANSACTIONS
@@ -219,4 +215,3 @@ window.addMoney = addMoney;
 window.getWallet = getWallet;
 window.getTransactions = getTransactions;
 window.getDisputes = getDisputes;
-window.topUpWallet = topUpWallet;
