@@ -160,6 +160,33 @@ function actionButtons(order) {
 // ======================
 // ORDER ACTIONS
 // ======================
+let selectedOrder = null;
+
+async function loadOrderAction() {
+  const input = document.getElementById("actionOrderId");
+  const orderId = input?.value.trim();
+
+  if (!orderId) {
+    alert("Enter an order ID first.");
+    return;
+  }
+
+  try {
+    const res = await getOrderById(orderId);
+    const order = res.data || res;
+    selectedOrder = order;
+
+    setText("previewOrderCode", order.code || order.order_code || order.id);
+    setText("previewMerchant", order.merchant_code || order.merchant_id || "—");
+    setText("previewCourier", order.courier_id || "Not assigned");
+    setText("previewAmount", `${order.amount || 0} DZD`);
+    setText("previewStatus", order.status || "UNKNOWN");
+
+  } catch (e) {
+    console.error("LOAD ORDER ERROR:", e);
+    alert(e.message || "Order not found.");
+  }
+}
 async function confirmOrderUI(id) {
   try {
     await confirmOrder(id);
@@ -291,6 +318,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("searchOrdersInput").value = "";
     document.getElementById("statusOrdersFilter").value = "all";
     renderOrders();
+    const loadOrderBtn = document.getElementById("loadOrderBtn");
+if (loadOrderBtn) loadOrderBtn.onclick = loadOrderAction;
   });
 
   document.getElementById("refreshOrdersBtn")?.addEventListener("click", loadOrders);
