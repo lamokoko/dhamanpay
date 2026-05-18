@@ -45,7 +45,25 @@ async function loadProfile() {
     console.error("PROFILE ERROR:", e);
   }
 }
+async function loadWallet() {
+  if (!user || !user.id) return;
 
+  try {
+    const res = await getWallet(user.id);
+    const wallet = res.data || res;
+
+    setText("availableAmountText", `${wallet.available_balance ?? 0} DZD`);
+    setText("payableAmountText", `${wallet.frozen_balance ?? 0} DZD`);
+    setText("refundedAmountText", `${wallet.refunded_amount ?? 0} DZD`);
+
+    setText("heroWallet", `${wallet.available_balance ?? 0} DZD`);
+    setText("heroReserved", `${wallet.frozen_balance ?? 0} DZD`);
+    setText("heroRefunded", `${wallet.refunded_amount ?? 0} DZD`);
+
+  } catch (e) {
+    console.error("WALLET ERROR:", e);
+  }
+}
 // ======================
 // LOAD ORDERS
 // ======================
@@ -233,9 +251,10 @@ async function topUpMoney() {
 
     await window.addMoney(user.id, amount);
 
-    showWalletMessage(`Successfully added ${amount} DZD to wallet!`, "success");
-    amountInput.value = "";
+   showWalletMessage(`Successfully added ${amount} DZD to wallet!`, "success");
+amountInput.value = "";
 
+await loadWallet();
   } catch (e) {
     console.error("TOP UP ERROR:", e);
     showWalletMessage(e.message || "Failed to add money.", "error");
@@ -252,7 +271,7 @@ function logout() {
 // ======================
 // INIT
 // ======================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   if (!getToken()) {
     window.location.href = "login.html";
     return;
@@ -264,6 +283,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const topUpBtn = document.getElementById("topUpBtn");
   if (topUpBtn) topUpBtn.onclick = topUpMoney;
 
-  loadProfile();
-  loadOrders();
+  document.getElementById("searchOrdersInput")?.addEventListener("input", renderOrders);
+
+  document.getElementById("statusOrdersFilter")?.addEventListener("change", renderOrders);
+
+  document.getElementById("resetOrdersBtn")?.addEventListener("click", () => {
+    document.getElementById("searchOrdersInput").value = "";
+    document.getElementById("statusOrdersFilter").value = "all";
+    renderOrders();
+  });
+
+  document.getElementById("refreshOrdersBtn")?.addEventListener("click", loadOrders);
+
+  await loadProfile();
+  await loadWallet();
+  await loadOrders();
 });
