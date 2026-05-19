@@ -344,18 +344,29 @@
     }
   }
 
-  function updateButtons(order) {
-    const releaseBtn = $("releaseBtn");
-    const refundBtn = $("refundBtn");
+ function updateButtons(order) {
+  const releaseBtn = $("releaseBtn");
+  const refundBtn = $("refundBtn");
 
-    if (releaseBtn) {
-      releaseBtn.disabled = !order || !["DELIVERED_PENDING", "DISPUTE_OPEN"].includes(order.status);
-    }
+  const canRelease = order && [
+    "ESCROW_FROZEN",
+    "DELIVERED_PENDING",
+    "DISPUTE_OPEN"
+  ].includes(order.status);
 
-    if (refundBtn) {
-      refundBtn.disabled = !order || order.status !== "DISPUTE_OPEN";
-    }
+  const canRefund = order && [
+    "ESCROW_FROZEN",
+    "DISPUTE_OPEN"
+  ].includes(order.status);
+
+  if (releaseBtn) {
+    releaseBtn.disabled = !canRelease;
   }
+
+  if (refundBtn) {
+    refundBtn.disabled = !canRefund;
+  }
+}
 
   async function settle(action) {
     const order = state.selectedOrder;
