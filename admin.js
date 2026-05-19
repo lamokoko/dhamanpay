@@ -1,3 +1,4 @@
+
 const API_BASE = "https://dhamanpay.onrender.com/api";
 
 const token = localStorage.getItem("token");
@@ -19,15 +20,13 @@ let ALL_ORDERS = [];
 
 async function loadOrders() {
   try {
-    const res = await fetch(`${API_BASE}/orders`, {
-      headers
-    });
-
+    const res = await fetch(`${API_BASE}/orders`, { headers });
     const data = await res.json();
 
     ALL_ORDERS = data.data || [];
 
     renderOrders(ALL_ORDERS);
+    calculateDhamanPayWallet(ALL_ORDERS);
 
   } catch (err) {
     console.error(err);
@@ -35,8 +34,26 @@ async function loadOrders() {
   }
 }
 
-function renderOrders(orders) {
+function calculateDhamanPayWallet(orders) {
+  let total = 0;
 
+  orders.forEach(order => {
+    const status = String(order.status || "").toUpperCase();
+
+    if (status === "COMPLETED" || status === "RELEASED") {
+      const amount = Number(order.amount || order.total_amount || 0);
+      total += amount * 0.018;
+    }
+  });
+
+  const walletEl = document.getElementById("dhamanpayWallet");
+
+  if (walletEl) {
+    walletEl.textContent = money(total);
+  }
+}
+
+function renderOrders(orders) {
   const container =
     document.getElementById("ordersList") ||
     document.getElementById("ordersContainer");
@@ -53,16 +70,10 @@ function renderOrders(orders) {
   }
 
   container.innerHTML = orders.map(o => {
-
-    const amount =
-      Number(o.amount || o.total_amount || 0);
-
+    const amount = Number(o.amount || o.total_amount || 0);
     const fee = amount * 0.018;
-
     const merchantGets = amount - fee;
-
-    const status =
-      String(o.status || "").toUpperCase();
+    const status = String(o.status || "").toUpperCase();
 
     const canRelease =
       status === "DELIVERED" ||
@@ -71,7 +82,6 @@ function renderOrders(orders) {
 
     return `
       <div class="list-card">
-
         <div class="list-head">
           <div>
             <div class="list-title">
@@ -93,7 +103,6 @@ function renderOrders(orders) {
         </div>
 
         <div class="actions-row" style="margin-top:15px;">
-
           ${
             canRelease
               ? `
@@ -113,31 +122,23 @@ function renderOrders(orders) {
                 </button>
               `
           }
-
         </div>
-
       </div>
     `;
   }).join("");
 }
 
 async function releaseOrder(orderId) {
-
   try {
-
-    const order =
-      ALL_ORDERS.find(o => o.id == orderId);
+    const order = ALL_ORDERS.find(o => o.id == orderId);
 
     if (!order) {
       alert("Order not found");
       return;
     }
 
-    const amount =
-      Number(order.amount || order.total_amount || 0);
-
+    const amount = Number(order.amount || order.total_amount || 0);
     const fee = amount * 0.018;
-
     const merchantGets = amount - fee;
 
     const confirmRelease = confirm(
@@ -164,30 +165,21 @@ async function releaseOrder(orderId) {
     const data = await res.json();
 
     if (!res.ok) {
-      throw new Error(
-        data.message || "Release failed"
-      );
+      throw new Error(data.message || "Release failed");
     }
 
     alert("Order released successfully");
 
-    loadOrders();
+    await loadOrders();
 
   } catch (err) {
-
     console.error(err);
-
-    alert(
-      err.message || "Release failed"
-    );
+    alert(err.message || "Release failed");
   }
 }
 
 window.releaseOrder = releaseOrder;
 
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
-    loadOrders();
-  }
-);
+document.addEventListener("DOMContentLoaded", () => {
+  loadOrders();
+});
